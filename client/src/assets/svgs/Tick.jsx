@@ -1,0 +1,22 @@
+import React from "react";
+
+export default function Tick() {
+  return (
+    <div>
+      <svg
+        width="82"
+        height="82"
+        viewBox="0 0 82 82"
+        fill="none"
+        xmlns="http://www.w3.org/2000/svg"
+      >
+        <circle cx="41" cy="41" r="41" fill="#023246" />
+        <path
+          d="M14 37.8776L31.2453 55.162C32.8081 56.7283 35.3457 56.7283 36.9086 55.162L68 24"
+          stroke="white"
+          strokeWidth="8"
+        />
+      </svg>
+    </div>
+  );
+}

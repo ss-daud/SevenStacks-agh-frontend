@@ -1,0 +1,13 @@
+/* Style for the entire form container */
+.form-container-signup {
+  width: "100%";
+  height: 100vh;
+  background-image: url("/src/assets/imgs/proj3.png");
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}

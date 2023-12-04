@@ -1,0 +1,53 @@
+import React from "react";
+
+export default function Date() {
+  return (
+    <div>
+      <svg
+        width="15"
+        height="15"
+        viewBox="0 0 15 15"
+        fill="none"
+        xmlns="http://www.w3.org/2000/svg"
+      >
+        <g clipPath="url(#clip0_748_678)">
+          <path
+            d="M1.60756 2.14258C1.3234 2.14258 1.05088 2.25546 0.849947 2.45639C0.649015 2.65732 0.536133 2.92984 0.536133 3.21401V13.3926C0.536133 13.6767 0.649015 13.9493 0.849947 14.1502C1.05088 14.3511 1.3234 14.464 1.60756 14.464H13.3933C13.6774 14.464 13.95 14.3511 14.1509 14.1502C14.3518 13.9493 14.4647 13.6767 14.4647 13.3926V3.21401C14.4647 2.92984 14.3518 2.65732 14.1509 2.45639C13.95 2.25546 13.6774 2.14258 13.3933 2.14258H11.2504"
+            stroke="#023246"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+          />
+          <path
+            d="M0.536133 5.89258H14.4647"
+            stroke="#023246"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+          />
+          <path
+            d="M3.75 0.536133V3.75042"
+            stroke="#023246"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+          />
+          <path
+            d="M11.25 0.536133V3.75042"
+            stroke="#023246"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+          />
+          <path
+            d="M3.75 2.14258H9.10714"
+            stroke="#023246"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+          />
+        </g>
+        <defs>
+          <clipPath id="clip0_748_678">
+            <rect width="15" height="15" fill="white" />
+          </clipPath>
+        </defs>
+      </svg>
+    </div>
+  );
+}

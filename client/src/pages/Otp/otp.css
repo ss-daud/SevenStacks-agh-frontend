@@ -1,0 +1,18 @@
+/* Style for the entire form container */
+.form-container-otp {
+  width: "100%";
+  height: 100vh;
+  background-image: url("/src/assets/imgs/proj3.png");
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+input::-webkit-outer-spin-button,
+input::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
