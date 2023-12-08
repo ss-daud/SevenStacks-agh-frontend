@@ -42,6 +42,7 @@ export default function KeepMountedModal({ open, onClose }) {
         email: email,
       };
       await axios.delete(`${AUTH_URL}api/user/delete`, { data });
+      alert("account deleted successfully");
       handleLogout();
     } catch (error) {
       console.error("Error deleting account:", error);

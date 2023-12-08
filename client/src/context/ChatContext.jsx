@@ -10,7 +10,7 @@ export function useChatContext() {
 export function ChatContextProvider({ children }) {
   const [input, setInput] = useState(""); // Add input state
   const [brainInput, setBrainInput] = useState(""); // Add brainInput state
-  const [response, setResponse] = useState(); // Add data state
+  const [response, setResponse] = useState(""); // Add data state
   const [reports, setReports] = useState([]);
   const [previousInput, setPreviousInput] = useState("");
 

@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Box, Button } from "@mui/material";
 import MicrophoneStream from "microphone-stream";
 import {
@@ -21,6 +21,7 @@ const Brain_Mic = ({
   onBrainEngage,
   onBrainDisengage,
   handleBrain,
+  format,
 }) => {
   const [recording, setRecording] = useState(false);
 
@@ -132,7 +133,9 @@ const Brain_Mic = ({
       startRecording();
       onBrainEngage(); // Call the engage function
     } else if (!recording) {
-      gptFunction(value);
+      if (format.length > 0) {
+        gptFunction(value);
+      }
     }
   };
 

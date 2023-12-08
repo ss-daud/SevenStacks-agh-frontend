@@ -71,14 +71,16 @@ export default function Signup() {
   const [showPassword, setShowPassword] = useState(false);
   const [showconfirmPassword, setShowConfirmPassword] = useState(false);
   const [error, setError] = useState("");
-
   const [loader, setLoader] = useState(false);
+
   const handleClickShowPassword = () => {
     setShowPassword((show) => !show);
   };
+
   const handleClickShowConfirmPassword = () => {
     setShowConfirmPassword((show) => !show);
   };
+
   const formik = useFormik({
     initialValues: {
       name: "",

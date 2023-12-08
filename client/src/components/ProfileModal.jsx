@@ -1,7 +1,7 @@
 import Modal from "@mui/material/Modal";
 import { useStyles } from "../pages/styles/Styles";
 import React, { useState, useEffect, useRef } from "react";
-import { useFormik } from "formik";
+import { FastField, useFormik } from "formik";
 import {
   TextField,
   Typography,
@@ -20,6 +20,8 @@ import Profile from "../assets/svgs/Profile";
 
 import SuccessModal from "./SuccessModal";
 import { AUTH_URL } from "../api";
+import PasswordModal from "./modals/PasswordModal";
+import { AlternateEmail } from "@mui/icons-material";
 
 const style = {
   position: "absolute",
@@ -70,6 +72,7 @@ export default function ProfileModal({ open, onClose }) {
   const classes = useStyles();
   const [loader, setLoader] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isPasswordModalOpen, setIsPasswordModalOpen] = useState(false);
   const [fetchedData, setFetchedData] = useState(null);
   const [image, setImage] = useState(null);
   const [prevImage, setPrevImage] = useState(null);
@@ -226,6 +229,11 @@ export default function ProfileModal({ open, onClose }) {
     }
   };
 
+  const handleClick = () => {
+    setIsPasswordModalOpen(true);
+    onClose();
+  };
+
   return (
     <div>
       <Modal
@@ -240,12 +248,11 @@ export default function ProfileModal({ open, onClose }) {
             <Box
               sx={{
                 width: "100%",
-
                 display: "flex",
                 flexDirection: "column",
                 alignItems: "center", // Center horizontally
                 justifyContent: "center", // Center vertically
-                marginBottom: 4,
+                marginBottom: 2,
               }}
             >
               <Typography
@@ -413,7 +420,12 @@ export default function ProfileModal({ open, onClose }) {
             ) : null}
 
             <Box
-              sx={{ display: "flex", justifyContent: "center", marginTop: 8 }}
+              sx={{
+                display: "flex",
+                justifyContent: "center",
+                marginTop: 8,
+                marginBottom: 2,
+              }}
             >
               <Button
                 variant="contained"
@@ -450,9 +462,33 @@ export default function ProfileModal({ open, onClose }) {
               </Button>
             </Box>
           </form>
+
+          <Box
+            style={{
+              width: "100%",
+              display: "flex",
+              justifyContent: "center",
+              marginTop: 2,
+            }}
+          >
+            <Typography
+              onClick={handleClick}
+              style={{
+                color: "#023246",
+                borderBottom: "3px solid #287094",
+                cursor: "pointer",
+              }}
+            >
+              Update Password
+            </Typography>
+          </Box>
         </Box>
       </Modal>
       <SuccessModal open={isModalOpen} onClose={() => setIsModalOpen(false)} />
+      <PasswordModal
+        open={isPasswordModalOpen}
+        onClose={() => setIsPasswordModalOpen(false)}
+      />
     </div>
   );
 }

@@ -84,7 +84,7 @@ export default function Login() {
           `${AUTH_URL}api/user/login`,
           apiObject
         );
-
+        console.log(response); // Log the entire response object
         if (response?.data?.token) {
           localStorage.setItem("token", response.data.token);
           navigate("/home");
@@ -92,7 +92,11 @@ export default function Login() {
           alert("Token not found in the response.");
         }
       } catch (err) {
-        setError("Wrong email or password");
+        if (err.response.data.message == "Account Not Found") {
+          setError("Account Not Found");
+        } else {
+          setError("Wrong email or password");
+        }
       } finally {
         setLoader(false);
       }

@@ -1,7 +1,7 @@
 export const gpt_query = (brain, input, history, format) => {
   let query = `Run this query ${brain} based on ${input} and ${
     history ? history : ""
-  } in format of ${format} `;
+  } in format of ${format} in single div `;
 
   let filter = `Add Filters : `;
 

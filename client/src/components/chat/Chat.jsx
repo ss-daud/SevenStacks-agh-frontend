@@ -19,7 +19,6 @@ import { useTopic } from "../../context/TopicContext";
 import { gpt_query } from "../../utils/GPT-query";
 import { useTheme } from "@mui/material/styles";
 import AWS_Mic from "../AWS Mic/AWS_Mic";
-import Brain_Mic from "../Brain_Mic";
 
 const Chat = () => {
   const {
@@ -35,7 +34,6 @@ const Chat = () => {
     setPreviousInput,
   } = useChatContext();
   const { addTopic, topics } = useTopic();
-
   const isScreen = useMediaQuery("(max-width: 1100px)");
   const isLargeScreen = useMediaQuery("(min-width:2000px)");
   const { data, isLoading, error, fetchData } = useOpenAI();
@@ -43,9 +41,8 @@ const Chat = () => {
   const [title, setTitle] = useState([]);
   const [isMicrophoneOn, setIsMicrophoneOn] = useState(false);
   const [isBrainEngaged, setIsBrainEngaged] = useState(false);
+
   const [previous, setPrevious] = useState("");
-  const [format, setFormat] = useState();
-  const theme = useTheme();
 
   const [isMediumScreen, setIsMediumScreen] = useState(
     window.innerWidth > 50 && window.innerWidth <= 900
@@ -93,33 +90,12 @@ const Chat = () => {
   };
 
   const getVoiceInput = (value) => {
-    setInput(`${previousInput} ${value}`);
+    setInput(`${previousInput} ${input} ${value}`);
   };
 
   const getBrainInput = (value) => {
     setBrainInput(value);
   };
-  const handleDoubleClick = (event, content) => {
-    console.log("Double-clicked on:", content);
-    setResponse(content);
-  };
-
-  // const getTitle = async () => {
-  //   try {
-  //     const response = await axios.get("http://localhost:8091/api/title/get");
-  //     setTitle(response?.data?.title);
-  //   } catch (err) {
-  //     console.error(err);
-  //   }
-  // };
-
-  // useEffect(() => {
-  //   getTitle();
-  // }, []);
-
-  // const ids = title.map((index) => index._id);
-  // const randomIndex = Math.floor(Math.random() * ids.length); // Generate a random index
-  // const selectedId = ids[randomIndex]; // Get the ID at the random index
 
   const handleSubmit = async () => {
     const trimmedText = brainInput.replace(/^save as\s*/i, "");
@@ -188,12 +164,15 @@ const Chat = () => {
   };
 
   const handleTemplate = async () => {
-    // console.log("Template");
-    // const trimmedText = brainInput.replace(/^load\s*/i, "");
-    // console.log(trimmedText);
     let trimmedText;
-    if (brainInput.toLowerCase().includes("demo 1")) {
-      trimmedText = "demo 1";
+    if (brainInput.toLowerCase().includes("review of system")) {
+      trimmedText = "review of system";
+    } else if (brainInput.toLowerCase().includes("r.o.s")) {
+      trimmedText = "r.o.s";
+    } else if (brainInput.toLowerCase().includes("physical exam")) {
+      trimmedText = "physical exam";
+    } else if (brainInput.toLowerCase().includes("p.e")) {
+      trimmedText = "p.e";
     }
 
     const token = localStorage.getItem("token");
@@ -211,7 +190,8 @@ const Chat = () => {
       });
 
       console.log(response?.data?.template);
-      setFormat(response?.data?.template);
+
+      return response?.data?.template || "";
     } catch (error) {
       alert("Error: no template exists for this name");
     }
@@ -250,7 +230,8 @@ const Chat = () => {
   //   console.log(inputData);
   //   fetchData(inputData);
   // };
-  const gptFunction = () => {
+  const gptFunction = async () => {
+    console.log(brainInput);
     let history_arr = topics.map((topic) => {
       return topic.response;
     });
@@ -258,11 +239,12 @@ const Chat = () => {
     let history = history_arr.join(", ");
 
     let inputData;
-
+    let query;
     // Extracting the first word from brainInput for better comparison
     const command = brainInput.split(" ")[0].trim().toLowerCase();
     console.log(command);
     if (command === "edit") {
+      query = ` edit  """ ${response || input}"""`;
       inputData = ` edit  """ ${response || input}"""`;
     } else if (command === "add") {
       inputData = ` ${brainInput} """ ${response}"""`;
@@ -278,20 +260,20 @@ const Chat = () => {
     } else if (command === "interpret") {
       inputData = gpt_query(brainInput, input, history);
     } else if (command === "list") {
-      console.log(brainInput);
-      console.log("list");
-      if (
-        brainInput.toLowerCase().includes("comprehensive") &&
-        brainInput.toLowerCase().includes("demo 1")
-      ) {
-        console.log("yes");
-        handleTemplate();
+      if (brainInput.toLowerCase().includes("comprehensive")) {
+        const _format = await handleTemplate();
 
-        inputData = gpt_query(brainInput, input, history, format);
+        if (input) {
+          query = `${brainInput} of ${input}in format of ${_format} in html format in single div `;
+        } else {
+          query = `${brainInput} of ${response}}in format of ${_format} in html format in single div `;
+        }
+
+        // query = gpt_query(brainInput, input, history, format);
       } else {
         const _value = response || input;
 
-        inputData = gpt_query(brainInput, input, history);
+        query = gpt_query(brainInput, input, history);
 
         // inputData = `${brainInput} in details  in html format  in single div of ${
         //   response || input
@@ -299,29 +281,26 @@ const Chat = () => {
       }
     } else {
       if (input) {
-        inputData = gpt_query(brainInput, input, history);
+        query = gpt_query(brainInput, input, history);
+        // inputData = gpt_query(brainInput, input, history);
       } else {
-        inputData = gpt_query(brainInput, response, history);
+        // inputData = gpt_query(brainInput, response, history);
+        query = gpt_query(brainInput, response, history);
       }
     }
 
-    console.log(inputData);
-    fetchData(inputData);
+    console.log(query);
+    fetchData(query);
   };
 
   useEffect(() => {
     setBrainInput("");
     if (data) {
-      // setPrevious(response); // Store the current response in the 'previous' state
       setResponse(data);
       setReports("");
       console.log(response);
     }
   }, [data]);
-
-  const handleTitleChange = () => {
-    setIsModalOpen(true);
-  };
 
   const handleClick = () => {
     console.log("click");
@@ -346,6 +325,59 @@ const Chat = () => {
       .replace(/<\/h5/g, "</h6");
     return modifiedContent;
   }
+
+  const [startRecording, setStartRecording] = useState(false);
+
+  const [recognition, setRecognition] = useState(null);
+  const startMicrophone = async () => {
+    try {
+      recognition.start();
+      setStartRecording(true);
+    } catch (error) {
+      console.error("Error accessing microphone:", error);
+    }
+  };
+
+  const stopMicrophone = () => {
+    recognition.stop();
+    setStartRecording(false);
+  };
+  const handleVoiceInput = (voiceInput) => {
+    getBrainInput(voiceInput);
+  };
+  useEffect(() => {
+    window.SpeechRecognition = window.webkitSpeechRecognition;
+    const reg = new SpeechRecognition();
+    reg.interimResults = true;
+    reg.continuous = true;
+    setRecognition(reg);
+    reg.addEventListener("result", (e) => {
+      const transcript = Array.from(e.results)
+        .map((result) => result[0])
+        .map((result) => result.transcript)
+        .join(" ");
+
+      handleVoiceInput(transcript);
+    });
+  }, []);
+
+  const handleBrainButtonClick = () => {
+    if (startRecording) {
+      stopMicrophone();
+      // onBrainDisengage(); // Call the disengage function
+      setIsBrainEngaged(false);
+      return;
+    }
+    if (!brainInput && !startRecording) {
+      startMicrophone();
+      setIsBrainEngaged(true);
+      // onBrainEngage(); // Call the engage function
+    } else if (!startRecording && brainInput.length) {
+      console.log("query");
+      gptFunction();
+    }
+  };
+
   return (
     <>
       <div
@@ -435,16 +467,16 @@ const Chat = () => {
                       dangerouslySetInnerHTML={{
                         __html: replaceHeaders(response),
                       }}
-                      onDoubleClick={() => handleDoubleClick(response)}
-                      contentEditable={true} // Add this line
+                      onBlur={(e) => setResponse(e.target.innerHTML)}
+                      contentEditable={true}
                       style={{
-                        border: "none",
-                        boxSizing: "border-box",
                         outline: "none",
+                        width: "100%",
                       }}
                     />
                   </div>
                 )}
+
                 {/* {reports.length > 0 && !response && (
                   <div
                     style={{
@@ -606,14 +638,10 @@ const Chat = () => {
                 onBrainDisengage={handleBrainDisengage}
               /> */}
               <BrainButton
-                value={brainInput}
-                gptFunction={gptFunction}
-                getBrainInput={getBrainInput}
                 isLoading={isLoading}
                 isMicrophoneOn={isMicrophoneOn}
-                isBrainEngaged={isBrainEngaged}
-                onBrainEngage={handleBrainEngage}
-                onBrainDisengage={handleBrainDisengage}
+                handleClick={handleBrainButtonClick}
+                startRecording={startRecording}
               />
             </div>
           </div>
