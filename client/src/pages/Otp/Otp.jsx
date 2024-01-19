@@ -62,22 +62,15 @@ function ForgetOTP() {
     }
   };
 
-
-  // RESEND OTP 
+  // RESEND OTP
   const resendOTPHandler = async () => {
-    console.log("Function OTP RESEND CALLED...");
-
-
     // GET EMAIL FROM LOCAL STORAGE
-    const _email = localStorage.getItem("email")
+    const _email = localStorage.getItem("email");
 
     // Make a POST request to check if the email exists
-    const response = await axios.post(
-      `${AUTH_URL}api/user/forgotPassword`,
-      {
-        email: _email,
-      }
-    );
+    const response = await axios.post(`${AUTH_URL}api/user/forgotPassword`, {
+      email: _email,
+    });
 
     if (response.data) {
       alert("otp has been send again on your registered email address");
@@ -85,8 +78,7 @@ function ForgetOTP() {
       // If the email does not exist, show an error message or handle it as needed
       alert("Email not found. Please check your email address.");
     }
-  }
-
+  };
 
   return (
     <>
@@ -200,21 +192,21 @@ function ForgetOTP() {
             </Typography>
 
             <div onClick={resendOTPHandler}>
-            <Typography
-              sx={{
-                font: "Poppins",
-                fontWeight: 700,
-                fontSize: "17px",
-                lineHeight: "32px",
-                color: "#023246",
-                marginLeft: 0.5,
-                textDecoration: "underline",
-                cursor: "pointer",
-              }}
-            >
-              Resend
-            </Typography>
-              </div>
+              <Typography
+                sx={{
+                  font: "Poppins",
+                  fontWeight: 700,
+                  fontSize: "17px",
+                  lineHeight: "32px",
+                  color: "#023246",
+                  marginLeft: 0.5,
+                  textDecoration: "underline",
+                  cursor: "pointer",
+                }}
+              >
+                Resend
+              </Typography>
+            </div>
           </Box>
 
           <Box

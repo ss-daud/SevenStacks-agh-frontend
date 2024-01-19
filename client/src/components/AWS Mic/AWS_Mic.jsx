@@ -1,14 +1,22 @@
-import React, { useState } from "react";
-import { Box, Button, useMediaQuery } from "@mui/material";
-import MicrophoneStream from "microphone-stream";
 import {
-  TranscribeStreamingClient,
   StartMedicalStreamTranscriptionCommand,
+  TranscribeStreamingClient,
 } from "@aws-sdk/client-transcribe-streaming";
+import { Box, Button, useMediaQuery } from "@mui/material";
 import { Buffer } from "buffer";
+import MicrophoneStream from "microphone-stream";
+import React, { useState } from "react";
 
-import Mike from "../Mike/Mike";
 import img1 from "../../assets/imgs/mic.png";
+
+import {
+  REGION,
+  LANGUAGE,
+  ACCESS_KEY_ID,
+  SECRET_ACCESS_KEY_ID,
+  SAMPLING_RATE,
+} from "../../api";
+import Mike from "../Mike/Mike";
 
 let microphoneStream = "";
 const AWS_Mic = ({
@@ -26,11 +34,12 @@ const AWS_Mic = ({
   const isLargeScreen = useMediaQuery("(min-width:2000px)");
 
   // ENV VARIABLES
-  const language = "en-US";
-  const SAMPLE_RATE = 44100;
-  const AWS_REGION = "us-east-1";
-  const AWS_ACCESS_KEY_ID = "AKIA6DCXGOM6LYBLPJME";
-  const AWS_SECRET_ACCESS_KEY = "bpr/Tjk6lwZ937ljVMjGJrr8//Grfd/DkSqdP0KX";
+
+  const language = LANGUAGE;
+  const SAMPLE_RATE = SAMPLING_RATE;
+  const AWS_REGION = REGION;
+  const AWS_ACCESS_KEY_ID = ACCESS_KEY_ID;
+  const AWS_SECRET_ACCESS_KEY = SECRET_ACCESS_KEY_ID;
 
   // MICROPHONE STREAM CREATION
   const createMicrophoneStream = async () => {
@@ -92,9 +101,9 @@ const AWS_Mic = ({
       const results = event.TranscriptEvent.Transcript.Results;
       if (results.length && !results[0]?.IsPartial) {
         const newTranscript = results[0].Alternatives[0].Transcript;
-        console.log("newTranscript :", newTranscript);
+
         accumulatedTranscriptions.push(newTranscript);
-        console.log(accumulatedTranscriptions);
+
         if (response) {
           getChatInput(accumulatedTranscriptions);
         }

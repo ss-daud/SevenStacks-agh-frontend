@@ -22,11 +22,16 @@ const useOpenAI = () => {
         model: "gpt-4",
         messages: [
           {
+            role: "system",
+            content:
+              "You are a physician that provides answers ready to be put in an electronic medical records system using the best practices in the medical field. Be concise, no editorial comments are needed, limit your answer to what is asked of you. Do not refer to external inputs from other physicians.",
+          },
+          {
             role: "user",
             content: prompt,
           },
         ],
-        temperature: 1,
+        temperature: 0.1,
       });
 
       const messageContent = response.choices[0]?.message?.content;

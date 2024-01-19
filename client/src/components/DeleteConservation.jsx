@@ -31,7 +31,6 @@ export default function DeleteConservation({ open, onClose, id }) {
   const handleDelete = async () => {
     try {
       const response = await axios.delete(`${AUTH_URL}api/topic/delete/${id}`);
-      console.log("Record deleted successfully:", response);
       if (response.status === 200) {
         removeTopic(id); // Remove the deleted topic from the context
         onClose();

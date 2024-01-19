@@ -12,7 +12,6 @@ export default function Verify() {
   const navigate = useNavigate();
   const urlParams = new URLSearchParams(window.location.search);
   const token = urlParams.get("token");
-  console.log(token);
 
   const handleSubmit = async () => {
     setLoader(true);

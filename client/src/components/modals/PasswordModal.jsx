@@ -90,7 +90,7 @@ export default function PasswordModal({ open, onClose }) {
 
   const handleKeyDown = (event) => {
     if (event.key === "Tab") {
-      event.preventDefault(); 
+      event.preventDefault();
 
       const activeElement = document.activeElement;
       const inputs = document.getElementsByTagName("input");
@@ -135,7 +135,6 @@ export default function PasswordModal({ open, onClose }) {
             onClose();
           }
         } catch (err) {
-          console.log(err);
           alert(err?.response?.data?.message);
         } finally {
           setLoader(false);

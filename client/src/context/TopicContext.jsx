@@ -27,15 +27,14 @@ export function TopicProvider({ children }) {
   }, []);
   const addTopic = (topic) => {
     setTopics((value) => {
-      return [topic, ...value];
+      return [...value, topic];
     });
   };
   const removeTopic = (topicId) => {
-    console.log("Removing", topicId);
     setTopics((prevTopics) =>
       prevTopics.filter((topic) => topic.id !== topicId)
     );
-    console.log(topics);
+
     fetchTopics();
   };
 

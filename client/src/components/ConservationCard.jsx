@@ -10,6 +10,10 @@ import { useChatContext } from "../context/ChatContext";
 import DeleteConservation from "./DeleteConservation";
 import { useTopic } from "../context/TopicContext";
 import EllipsisText from "./text/EllipsiText";
+import Message from "../assets/svgs/Message";
+import Copy from "../assets/svgs/Copy";
+import Print from "../assets/svgs/Print";
+import Remove from "../assets/svgs/Remove";
 
 const ConservationCard = ({ text, color, res, id }) => {
   const { topics } = useTopic();
@@ -19,7 +23,6 @@ const ConservationCard = ({ text, color, res, id }) => {
   const { setResponse } = useChatContext();
 
   const handleCopyToClipboard = (contentToCopy) => {
-    console.log(contentToCopy);
     // Create a temporary textarea element to hold the text to copy
     const textArea = document.createElement("textarea");
 
@@ -110,76 +113,56 @@ const ConservationCard = ({ text, color, res, id }) => {
             alignItems: "flex-start",
           }}
         >
-          <img src={img} alt="Brs" />
+          <Message />
         </Box>
         <Box
           onClick={() => setResponse(res)}
           sx={{
             width: "100%",
-
             display: "flex",
             alignItems: "center",
             justifyContent: "center",
           }}
         >
           <EllipsisText text={text} />
-          {/* <Typography
-            sx={{
-              marginLeft: 2,
-              fontFamily: "Montserrat, sans-serif",
-              fontWeight: 400,
-              fontSize: "16px",
-              lineHeight: "20px",
-              color: "#000000",
-              whiteSpace: "nowrap",
-              overflow: "hidden",
-              textOverflow: "ellipsis",
-              cursor: "pointer", // Change cursor on hover
-              "&:hover": {
-                whiteSpace: "normal",
-                overflow: "visible",
-              },
+        </Box>
+        <Box
+          style={{
+            display: "flex",
+            alignItems: "center",
+            gap: "4px",
+          }}
+        >
+          <Box
+            onClick={handlePrint}
+            style={{
+              display: "flex",
+              justifyContent: "center",
+              alignItems: "center",
             }}
-            onMouseEnter={() => setIsHovered(true)}
-            onMouseLeave={() => setIsHovered(false)}
           >
-            {isHovered
-              ? text
-              : text.split(" ").length > 2
-              ? `${text.split(" ").slice(0, 2).join(" ")} ...`
-              : text}
-          </Typography> */}
-        </Box>
-        <Box
-          onClick={handlePrint}
-          style={{
-            display: "flex",
-            justifyContent: "center",
-            alignItems: "center",
-            marginRight: 6,
-          }}
-        >
-          <img src={img2} alt="Brs" style={{ imageRendering: "pixelated" }} />
-        </Box>
-        <Box
-          onClick={() => handleCopyToClipboard(res)}
-          style={{
-            display: "flex",
-            justifyContent: "center",
-            alignItems: "center",
-          }}
-        >
-          <img src={img1} alt="Brs" />
-        </Box>
-        <Box
-          onClick={() => handleDelete()}
-          style={{
-            display: "flex",
-            justifyContent: "center",
-            alignItems: "center",
-          }}
-        >
-          <ClearIcon fontSize="13" style={{ marginLeft: 2 }} color="#000000" />
+            <Print />
+          </Box>
+          <Box
+            onClick={() => handleCopyToClipboard(res)}
+            style={{
+              display: "flex",
+              justifyContent: "center",
+              alignItems: "center",
+            }}
+          >
+            <Copy />
+          </Box>
+          <Box
+            onClick={() => handleDelete()}
+            style={{
+              display: "flex",
+              justifyContent: "center",
+              alignItems: "center",
+            }}
+          >
+            <Remove />
+          </Box>
         </Box>
       </Box>
       <DeleteConservation

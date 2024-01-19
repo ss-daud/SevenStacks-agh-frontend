@@ -1,32 +1,28 @@
-import React, { useState } from "react";
-import { useFormik } from "formik";
-import { AUTH_URL } from "../../api";
-
+import styled from "@emotion/styled";
+import VisibilityOffOutlinedIcon from "@mui/icons-material/VisibilityOffOutlined";
+import VisibilityOutlinedIcon from "@mui/icons-material/VisibilityOutlined";
 import {
+  Box,
+  Button,
+  IconButton,
+  InputAdornment,
   TextField,
   Typography,
-  IconButton,
-  Button,
-  InputAdornment,
 } from "@mui/material";
-import VisibilityOutlinedIcon from "@mui/icons-material/VisibilityOutlined";
-import VisibilityOffOutlinedIcon from "@mui/icons-material/VisibilityOffOutlined";
 import CircularProgress from "@mui/material/CircularProgress";
-import * as yup from "yup";
 import axios from "axios";
-import styled from "@emotion/styled";
+import { useFormik } from "formik";
+import React, { useState } from "react";
+import * as yup from "yup";
+import { AUTH_URL } from "../../api";
 
-import { Box } from "@mui/material";
+import "./changePassword.css";
 
-import { ErrorOutline } from "@mui/icons-material";
-import EmailOutlined from "@mui/icons-material/EmailOutlined";
-import "./signup.css";
-import { Link, NavLink, useNavigate, useNavigation } from "react-router-dom";
-import Name from "../../assets/svgs/Name";
+import { useNavigate } from "react-router-dom";
 
 const CustomTextField = styled(TextField)({
   "& .MuiInputBase-root": {
-    height: "38px",
+    height: "48px",
     fontSize: "16px",
     fontFamily: "'DM Sans', sans-serif",
     lineHeight: "28px",
@@ -49,14 +45,11 @@ const CustomTextField = styled(TextField)({
 });
 
 const validationSchema = yup.object({
-  name: yup.string("Enter your full name").required("name is required"),
-  username: yup.string("Enter your  username").required("username is required"),
-  email: yup
-    .string("Enter your email")
-    .email("Enter a valid email")
-    .matches(/^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i, "Enter a valid email")
-    .required("email is required"),
   password: yup
+    .string("Enter your password")
+    .min(8, "password should be of minimum 8 characters length")
+    .required("password is required"),
+  newPassword: yup
     .string("Enter your password")
     .min(8, "password should be of minimum 8 characters length")
     .required("password is required"),
@@ -66,12 +59,14 @@ const validationSchema = yup.object({
     .required("password is required"),
 });
 
-export default function Signup() {
+export default function ChangePassword() {
   const navigate = useNavigate();
+
   const [showPassword, setShowPassword] = useState(false);
   const [showconfirmPassword, setShowConfirmPassword] = useState(false);
-  const [error, setError] = useState("");
+  const [showNewPassword, setShowNewPassword] = useState(false);
   const [loader, setLoader] = useState(false);
+  const [error, setError] = useState("");
 
   const handleClickShowPassword = () => {
     setShowPassword((show) => !show);
@@ -81,42 +76,58 @@ export default function Signup() {
     setShowConfirmPassword((show) => !show);
   };
 
+  const handleClickShowNewPassword = () => {
+    setShowNewPassword((show) => !show);
+  };
+
+  //   const handleKeyDown = (event) => {
+  //     if (event.key === "Tab") {
+  //       event.preventDefault();
+
+  //       const activeElement = document.activeElement;
+  //       const inputs = document.getElementsByTagName("input");
+
+  //       const currentIndex = Array.from(inputs).indexOf(activeElement);
+
+  //       const nextIndex = currentIndex + 1 < inputs.length ? currentIndex + 1 : 0;
+  //       inputs[nextIndex].focus();
+  //     }
+  //   };
+
   const formik = useFormik({
     initialValues: {
-      name: "",
-      username: "",
-      email: "",
       password: "",
+      newPassword: "",
       confirmPassword: "",
     },
     validationSchema: validationSchema,
     onSubmit: async (values) => {
-      if (values.password !== values.confirmPassword) {
+      if (values.newPassword !== values.confirmPassword) {
         alert("Passwords do not match");
       } else {
         const apiObject = {
-          name: values.name,
-          username: values.username,
-          email: values.email,
           password: values.password,
+          newPassword: values.newPassword,
         };
 
         setLoader(true);
-        localStorage.setItem("email", values.email);
-
+        const token = localStorage.getItem("token");
         try {
           const response = await axios.post(
-            `${AUTH_URL}api/user/register`,
-            apiObject
+            `${AUTH_URL}api/user/updatePassword`,
+            apiObject,
+            {
+              headers: {
+                Authorization: `Bearer ${token}`, // Append the token to the headers
+                "Content-Type": "application/json",
+              },
+            }
           );
-
-          if (response) {
-            navigate("/success");
-          } else {
-            alert("Token not found in the response.");
+          if (response.status == 200) {
+            navigate("/home");
           }
         } catch (err) {
-          setError(err?.response?.data?.message);
+          alert(err?.response?.data?.message);
         } finally {
           setLoader(false);
         }
@@ -126,12 +137,12 @@ export default function Signup() {
 
   return (
     <>
-      <div className="form-container-signup">
+      <div className="form-container-password ">
         <form
           onSubmit={formik.handleSubmit}
           style={{
-            width: 470,
-            padding: "25px 0",
+            width: 454,
+            padding: "100px 0",
             border: "1px solid #D9D9D9",
             borderRadius: "20px",
             backgroundColor: "#FFFFFF",
@@ -139,197 +150,28 @@ export default function Signup() {
         >
           <Box
             sx={{
+              width: "100%",
               display: "flex",
-              justifyContent: "center",
+              flexDirection: "column",
               alignItems: "center",
+              justifyContent: "center",
+              marginBottom: 5,
             }}
           >
             <Typography
               sx={{
-                font: "'DM Sans', sans-serif",
-                fontWeight: 700,
-                marginBottom: 1,
-                fontSize: "28px",
-                lineHeight: "28px",
+                width: "100%",
+                font: "Inter",
+                fontWeight: "550",
+                fontSize: "24px",
+                lineHeight: "16px",
                 color: "#023246",
+                textAlign: "center",
               }}
             >
-              Signup
+              Change Password
             </Typography>
           </Box>
-          <Box>
-            <Typography
-              sx={{
-                font: "Poppins",
-                fontWeight: 400,
-                fontSize: "16px",
-                lineHeight: "32px",
-                color: "#287094",
-                marginBottom: 1,
-                marginLeft: 7,
-              }}
-            >
-              Full Name
-            </Typography>
-          </Box>
-          <Box
-            sx={{
-              display: "flex",
-              justifyContent: "center",
-            }}
-          >
-            <CustomTextField
-              id="name"
-              placeholder="Enter your full name "
-              variant="outlined"
-              value={formik.values.name}
-              onChange={formik.handleChange}
-              error={formik.touched.name && Boolean(formik.errors.name)}
-              InputProps={{
-                endAdornment: (
-                  <InputAdornment position="end">
-                    <Name />
-                  </InputAdornment>
-                ),
-              }}
-            />
-          </Box>
-          {formik.touched.name && formik.errors.name ? (
-            <Typography
-              sx={{
-                font: "Poppins",
-                fontSize: "12px",
-                lineHeight: "16px",
-                display: "flex",
-                justifyContent: "flex-start",
-                marginLeft: "50px",
-                color: "red",
-              }}
-            >
-              {formik.errors.name}
-            </Typography>
-          ) : null}
-          <Box>
-            <Typography
-              sx={{
-                font: "Poppins",
-                fontWeight: 400,
-                fontSize: "16px",
-                lineHeight: "32px",
-                color: "#287094",
-                marginTop: 1,
-                marginBottom: 1,
-                marginLeft: 7,
-              }}
-            >
-              Username
-            </Typography>
-          </Box>
-          <Box
-            sx={{
-              display: "flex",
-              justifyContent: "center",
-            }}
-          >
-            <CustomTextField
-              id="username"
-              placeholder="Enter your username"
-              variant="outlined"
-              value={formik.values.username}
-              onChange={formik.handleChange}
-              error={formik.touched.username && Boolean(formik.errors.username)}
-              InputProps={{
-                endAdornment: (
-                  <InputAdornment position="end">
-                    <Name />
-                  </InputAdornment>
-                ),
-              }}
-            />
-          </Box>
-          {formik.touched.username && formik.errors.username ? (
-            <Typography
-              sx={{
-                font: "Poppins",
-                fontSize: "12px",
-                lineHeight: "16px",
-                display: "flex",
-                justifyContent: "flex-start",
-                marginLeft: "50px",
-                color: "red",
-              }}
-            >
-              {formik.errors.username}
-            </Typography>
-          ) : null}
-          <Box>
-            <Typography
-              sx={{
-                font: "Poppins",
-                fontWeight: 400,
-                fontSize: "16px",
-                lineHeight: "32px",
-                color: "#287094",
-                marginBottom: 1,
-                marginTop: 1,
-                marginLeft: 7,
-              }}
-            >
-              Email
-            </Typography>
-            <Typography
-              sx={{
-                font: "Poppins",
-                fontWeight: 400,
-                fontSize: "16px",
-                lineHeight: "32px",
-                color: "red",
-                marginBottom: 1,
-                marginTop: 1,
-                marginLeft: 7,
-              }}
-            >
-              {error}
-            </Typography>
-          </Box>
-
-          <Box
-            sx={{
-              display: "flex",
-              justifyContent: "center",
-            }}
-          >
-            <CustomTextField
-              id="email"
-              placeholder="Enter your email "
-              variant="outlined"
-              value={formik.values.email}
-              onChange={formik.handleChange}
-              error={formik.touched.email && Boolean(formik.errors.email)}
-              InputProps={{
-                endAdornment: (
-                  <InputAdornment position="end">
-                    <EmailOutlined style={{ color: "#287094" }} />
-                  </InputAdornment>
-                ),
-              }}
-            />
-          </Box>
-          {formik.touched.email && formik.errors.email ? (
-            <Typography
-              sx={{
-                font: "Poppins",
-                fontSize: "12px",
-                lineHeight: "16px",
-                display: "flex",
-                justifyContent: "flex-start",
-                marginLeft: "50px",
-                color: "red",
-              }}
-            >
-              {formik.errors.email}
-            </Typography>
-          ) : null}
           <Box sx={{ width: "100%", marginBottom: 1 }}>
             <Typography
               sx={{
@@ -342,7 +184,7 @@ export default function Signup() {
                 marginLeft: 7,
               }}
             >
-              Password
+              Current Password
             </Typography>
           </Box>
           <Box
@@ -353,6 +195,7 @@ export default function Signup() {
           >
             <CustomTextField
               id="password"
+              //   onKeyDown={handleKeyDown}
               type={showPassword ? "text" : "password"}
               variant="outlined"
               placeholder="Enter your password"
@@ -394,11 +237,85 @@ export default function Signup() {
                 lineHeight: "16px",
                 display: "flex",
                 justifyContent: "flex-start",
-                marginLeft: "50px",
+                marginLeft: "55px",
                 color: "red",
               }}
             >
               {formik.errors.password}
+            </Typography>
+          ) : null}
+          <Box sx={{ width: "100%", marginBottom: 1 }}>
+            <Typography
+              sx={{
+                font: "Poppins",
+                fontWeight: 400,
+                fontSize: "16px",
+                lineHeight: "32px",
+                color: "#287094",
+                marginTop: 1,
+                marginLeft: 7,
+              }}
+            >
+              New Password
+            </Typography>
+          </Box>
+          <Box
+            sx={{
+              display: "flex",
+              justifyContent: "center",
+            }}
+          >
+            <CustomTextField
+              id="newPassword"
+              //   onKeyDown={handleKeyDown}
+              type={showNewPassword ? "text" : "password"}
+              variant="outlined"
+              placeholder="Enter your password"
+              value={formik.values.newPassword}
+              onChange={formik.handleChange}
+              error={
+                formik.touched.newPassword && Boolean(formik.errors.newPassword)
+              }
+              InputProps={{
+                endAdornment: (
+                  <InputAdornment position="end">
+                    <IconButton
+                      onClick={handleClickShowNewPassword}
+                      style={{ color: "#287094", fontSize: "21px" }}
+                    >
+                      {!showNewPassword ? (
+                        <VisibilityOffOutlinedIcon
+                          sx={{ height: "18.5px", width: "21px" }}
+                        />
+                      ) : (
+                        <VisibilityOutlinedIcon
+                          sx={{
+                            height: "18.5px !important",
+                            width: "21px !important",
+                            padding: "0px",
+                            fontSize: "16px",
+                          }}
+                        />
+                      )}
+                    </IconButton>
+                  </InputAdornment>
+                ),
+              }}
+            />
+          </Box>
+          {formik.touched.newPassword && formik.errors.newPassword ? (
+            <Typography
+              sx={{
+                font: "Poppins",
+                fontSize: "12px",
+                lineHeight: "16px",
+                display: "flex",
+                justifyContent: "flex-start",
+                marginLeft: "55px",
+                color: "red",
+              }}
+            >
+              {formik.errors.newPassword}
             </Typography>
           ) : null}
           <Box sx={{ width: "100%", marginBottom: 1 }}>
@@ -424,6 +341,7 @@ export default function Signup() {
           >
             <CustomTextField
               id="confirmPassword"
+              //   onKeyDown={handleKeyDown}
               type={showconfirmPassword ? "text" : "password"}
               variant="outlined"
               placeholder="Enter your password"
@@ -468,65 +386,38 @@ export default function Signup() {
                 lineHeight: "16px",
                 display: "flex",
                 justifyContent: "flex-start",
-                marginLeft: "50px",
+                marginLeft: "55px",
                 color: "red",
               }}
             >
               {formik.errors.confirmPassword}
             </Typography>
           ) : null}
-          <Box sx={{ display: "flex", justifyContent: "center", marginTop: 5 }}>
+          <Box
+            sx={{
+              display: "flex",
+              justifyContent: "center",
+              marginTop: 8,
+            }}
+          >
             <Button
               variant="contained"
               type="submit"
-              onClick={formik.submit}
               style={{
-                marginBottom: 10,
                 backgroundColor: "#023246", // Replace with your custom color
                 color: "white",
-                width: 361,
-                height: 48,
+                width: 118,
+                height: 36,
                 borderRadius: 8,
               }}
             >
               {loader ? (
                 <CircularProgress sx={{ color: "white" }} size={23} />
               ) : (
-                " Register"
+                " Save"
               )}
             </Button>
           </Box>
-          <NavLink to="/" style={{ textDecoration: "none" }}>
-            <Box
-              sx={{ display: "flex", justifyContent: "center", marginTop: 3 }}
-            >
-              <Typography
-                sx={{
-                  font: "Poppins",
-                  fontWeight: 400,
-                  fontSize: "19px",
-                  lineHeight: "32px",
-                  color: "#023246",
-                  textDecoration: "none",
-                }}
-              >
-                Already have an account?
-              </Typography>
-              <Typography
-                sx={{
-                  font: "Poppins",
-                  fontWeight: 600,
-                  fontSize: "19px",
-                  lineHeight: "32px",
-                  color: "#023246",
-                  marginLeft: 1,
-                  textDecoration: "underline",
-                }}
-              >
-                Login
-              </Typography>
-            </Box>
-          </NavLink>
         </form>
       </div>
     </>

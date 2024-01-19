@@ -12,7 +12,7 @@ import ProtectedRoutes from "./utils/ProtectedRoutes";
 import { TopicProvider } from "./context/TopicContext";
 import DeleteConservation from "./components/DeleteConservation";
 import AuthRoutes from "./utils/AuthRoutes";
-import Mic from "./pages/mic/Mic";
+import ChangePassword from "./pages/changePassword/ChangePassword";
 
 function App() {
   return (
@@ -20,25 +20,11 @@ function App() {
       <ThemeProvider>
         <Routes>
           {/* <Route path="/" element={<Login />} /> */}
-          <Route
-            path="/"
-            element={
-              <AuthRoutes>
-                <Login />
-              </AuthRoutes>
-            }
-          />
+          <Route path="/" element={<Login />} />
           {/* <Route path="/login" element={<Login />} /> */}
-          <Route
-            path="/login"
-            element={
-              <AuthRoutes>
-                <Login />
-              </AuthRoutes>
-            }
-          />
+          <Route path="/login" element={<Login />} />
           {/* <Route path="/signup" element={<Signup />} /> */}
-          <Route
+          {/* <Route
             path="/signup"
             element={
               <AuthRoutes>
@@ -46,34 +32,13 @@ function App() {
               </AuthRoutes>
             }
           />
+            */}
           {/* <Route path="/forgotpassword" element={<ForgotPassword />} /> */}
-          <Route
-            path="/forgotpassword"
-            element={
-              <AuthRoutes>
-                <ForgotPassword />
-              </AuthRoutes>
-            }
-          />
+          <Route path="/forgotpassword" element={<ForgotPassword />} />
           {/* <Route path="/resetpassword" element={<ResetPassword />} /> */}
-          <Route
-            path="/resetpassword"
-            element={
-              <AuthRoutes>
-                <ResetPassword />
-              </AuthRoutes>
-            }
-          />
+          <Route path="/resetpassword" element={<ResetPassword />} />
           {/* <Route path="/otp" element={<ForgetOTP />} /> */}
-          <Route
-            path="/otp"
-            element={
-              <AuthRoutes>
-                <ForgetOTP />
-              </AuthRoutes>
-            }
-          />
-
+          <Route path="/otp" element={<ForgetOTP />} />
           <Route
             path="/home"
             element={
@@ -100,12 +65,12 @@ function App() {
               </AuthRoutes>
             }
           />
-
+          {/* <Route path="/success" element={<Success />} /> */}
           <Route
-            path="/mic"
+            path="/change-password"
             element={
               <AuthRoutes>
-                <Mic />
+                <ChangePassword />
               </AuthRoutes>
             }
           />

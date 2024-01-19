@@ -97,7 +97,6 @@ export default function ProfileModal({ open, onClose }) {
       setFetchedData(response?.data);
 
       if (response?.data?.user?.userImage) {
-        console.log(response?.data?.user?.userImage);
         setImage(
           `https://ai-emr.s3.amazonaws.com/profile-images/${response?.data?.user?.userImage}`
         );
@@ -134,9 +133,7 @@ export default function ProfileModal({ open, onClose }) {
     reader.onload = function () {
       cb(reader.result);
     };
-    reader.onerror = function (error) {
-      console.log("Error: ", error);
-    };
+    reader.onerror = function (error) {};
   };
 
   const formik = useFormik({
@@ -154,7 +151,7 @@ export default function ProfileModal({ open, onClose }) {
         if (image) {
           formData.append("image", image);
         }
-        console.log(formData.has("image"));
+
         setLoader(true);
         try {
           const response = await axios.put(
@@ -167,10 +164,9 @@ export default function ProfileModal({ open, onClose }) {
               },
             }
           );
-          console.log(response);
+
           if (response?.data?.message == "User updated successfully") {
             setIsModalOpen(true);
-            onClose();
           }
         } catch (error) {
           console.error("Error saving profile:", error);
@@ -181,7 +177,7 @@ export default function ProfileModal({ open, onClose }) {
         const formData = new FormData();
         formData.append("name", values.name);
         formData.append("email", values.email);
-        console.log(formData.has("image"));
+
         setLoader(true);
         try {
           const response = await axios.put(
@@ -194,7 +190,6 @@ export default function ProfileModal({ open, onClose }) {
               },
             }
           );
-          console.log(response);
           if (response?.data?.message == "User updated successfully") {
             onClose();
           }
@@ -231,7 +226,6 @@ export default function ProfileModal({ open, onClose }) {
 
   const handleClick = () => {
     setIsPasswordModalOpen(true);
-    onClose();
   };
 
   return (

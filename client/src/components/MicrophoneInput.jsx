@@ -3,7 +3,6 @@ import React, { useState, useEffect } from "react";
 import { Box, Button, useMediaQuery } from "@mui/material";
 import img1 from "../assets/imgs/mic.png";
 import Mike from "./Mike/Mike";
-import TitleModal from "./modals/TitleModal";
 
 const MicrophoneInput = ({
   data,
@@ -14,8 +13,6 @@ const MicrophoneInput = ({
   previousInput,
   addPreviouseInput,
 }) => {
-  console.log("MICROPHONE FUNCTION");
-
   const [attached, setAttached] = useState(false);
   const [audioStream, setAudioStream] = useState(null);
   const [isMicrophoneActive, setIsMicrophoneActive] = useState(false);
@@ -38,8 +35,6 @@ const MicrophoneInput = ({
   }, []);
 
   const handleInput = (e, PI) => {
-    console.log("Microphone Active: ", PI);
-
     const transcript = Array.from(e.results)
       .map((result) => result[0])
       .map((result) => result.transcript)
@@ -67,7 +62,6 @@ const MicrophoneInput = ({
     recognition.stop();
     recognition.removeEventListener("result", handleInput);
     addPreviouseInput();
-    console.log("Microphone is stopped");
   };
 
   useEffect(() => {

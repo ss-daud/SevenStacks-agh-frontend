@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import {
   Button,
   TextField,
@@ -6,12 +6,10 @@ import {
   Box,
   useMediaQuery,
 } from "@mui/material";
-import "./chat.css";
 import { AUTH_URL } from "../../api";
 import useOpenAI from "../../openai/OpenAi";
 import MicrophoneInput from "../MicrophoneInput";
 import img1 from "../../assets/imgs/undo.png";
-import TitleModal from "../modals/TitleModal";
 import BrainButton from "../BrainButton";
 import { useChatContext } from "../../context/ChatContext";
 import axios from "axios";
@@ -41,6 +39,8 @@ const Chat = () => {
   const [title, setTitle] = useState([]);
   const [isMicrophoneOn, setIsMicrophoneOn] = useState(false);
   const [isBrainEngaged, setIsBrainEngaged] = useState(false);
+  const [previousResponse, setPreviousResponse] = useState("");
+  const responseRef = useRef(null);
 
   const [previous, setPrevious] = useState("");
 
@@ -56,12 +56,12 @@ const Chat = () => {
     setIsMediumScreen(window.innerWidth > 50 && window.innerWidth <= 900);
   };
 
-  const handleBrainEngage = () => {
-    setIsBrainEngaged(true);
-  };
-
-  const handleBrainDisengage = () => {
-    setIsBrainEngaged(false);
+  const updateChatInputs = () => {
+    setInput("");
+    setBrainInput("");
+    setResponse("");
+    setReports("");
+    setPreviousInput("");
   };
 
   useEffect(() => {
@@ -73,24 +73,41 @@ const Chat = () => {
 
   const handleMicrophoneStatusChange = (microphoneOn) => {
     setIsMicrophoneOn(microphoneOn);
-    console.log("Microphone status changed:", microphoneOn);
-  };
-  const handleBrain = () => {
-    setIsMicrophoneOn(false);
   };
 
   const handleInputChange = (event) => {
     setInput(event.target.value);
   };
 
+  const getCursorPosition = () => {
+    const selection = window.getSelection();
+    if (selection.rangeCount > 0) {
+      const range = selection.getRangeAt(0);
+      const { startContainer, startOffset } = range;
+
+      // The cursor position
+      const cursorPosition = startOffset;
+
+      return cursorPosition;
+    }
+  };
+
   const getChatInput = (value) => {
-    setPrevious(value);
-    setResponse(`${response} ${previous}`);
-    console.log(previous);
+    const cursorPosition = getCursorPosition();
+    if (cursorPosition !== -1) {
+      const start = response.substring(0, cursorPosition);
+      const end = response.substring(cursorPosition);
+
+      // Append the value at the cursor position
+      const newResponse = `${start}${value}${end}`;
+
+      // Update the response state
+      setResponse(newResponse);
+    }
   };
 
   const getVoiceInput = (value) => {
-    setInput(`${previousInput} ${input} ${value}`);
+    setInput(`${input} ${value}`);
   };
 
   const getBrainInput = (value) => {
@@ -102,7 +119,7 @@ const Chat = () => {
 
     const apiObject = {
       heading: trimmedText,
-      response: response,
+      response: response || input,
     };
 
     const token = localStorage.getItem("token");
@@ -123,19 +140,18 @@ const Chat = () => {
         addTopic(response?.data?.newTopic);
       }
 
-      setBrainInput("");
+      updateChatInputs();
     } catch (error) {
       console.error("Error saving profile:", error);
     }
   };
 
   const handlePrint = async () => {
-    console.log("print");
     const trimmedText = brainInput.replace(/^print\s*/i, "");
-    console.log(trimmedText);
+
     const wordArray = trimmedText.split(/\s+and\s+/);
     setTitle(wordArray);
-    console.log(wordArray);
+
     const token = localStorage.getItem("token");
 
     try {
@@ -150,7 +166,6 @@ const Chat = () => {
           "Content-Type": "application/json",
         },
       });
-      console.log(response);
       if (response?.data?.responses.length != 0) {
         setReports(response?.data?.responses);
       } else {
@@ -163,23 +178,54 @@ const Chat = () => {
     }
   };
 
+  const handleSave = async () => {
+    const token = localStorage.getItem("token");
+    try {
+      const response = await axios.get(`${AUTH_URL}api/topic/my-topics`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
+      const topics = response.data.topics;
+
+      const allResponses = topics.map((topic) => topic.response);
+
+      return allResponses;
+    } catch (error) {
+      alert("Error: no template exists for this name");
+    }
+  };
   const handleTemplate = async () => {
-    let trimmedText;
-    if (brainInput.toLowerCase().includes("review of system")) {
-      trimmedText = "review of system";
-    } else if (brainInput.toLowerCase().includes("r.o.s")) {
-      trimmedText = "r.o.s";
-    } else if (brainInput.toLowerCase().includes("physical exam")) {
-      trimmedText = "physical exam";
-    } else if (brainInput.toLowerCase().includes("p.e")) {
-      trimmedText = "p.e";
+    // let trimmedText;
+    // if (brainInput.toLowerCase().includes("review of system")) {
+    //   trimmedText = "review of system";
+    // } else if (brainInput.toLowerCase().includes("r.o.s")) {
+    //   trimmedText = "r.o.s";
+    // } else if (brainInput.toLowerCase().includes("physical exam")) {
+    //   trimmedText = "physical exam";
+    // } else if (brainInput.toLowerCase().includes("p.e")) {
+    //   trimmedText = "p.e";
+    // } else if (brainInput.toLowerCase().includes("pe")) {
+    //   trimmedText = "pe";
+    // } else if (brainInput.toLowerCase().includes("ros")) {
+    //   trimmedText = "ros";
+    // }
+    let textAfterComprehensive = "";
+
+    let indexComprehensive = brainInput.indexOf("comprehensive");
+
+    if (indexComprehensive !== -1) {
+      // Extract the text after "comprehensive"
+      textAfterComprehensive = brainInput
+        .substring(indexComprehensive + "comprehensive".length + 1)
+        .trim();
     }
 
     const token = localStorage.getItem("token");
     const apiObject = {
-      name: trimmedText,
+      name: textAfterComprehensive,
     };
-    console.log(apiObject);
 
     try {
       const response = await axios.get(`${AUTH_URL}api/template`, {
@@ -188,8 +234,6 @@ const Chat = () => {
           Authorization: `Bearer ${token}`,
         },
       });
-
-      console.log(response?.data?.template);
 
       return response?.data?.template || "";
     } catch (error) {
@@ -227,11 +271,10 @@ const Chat = () => {
   //     }
   //   }
 
-  //   console.log(inputData);
+  //
   //   fetchData(inputData);
   // };
   const gptFunction = async () => {
-    console.log(brainInput);
     let history_arr = topics.map((topic) => {
       return topic.response;
     });
@@ -241,8 +284,9 @@ const Chat = () => {
     let inputData;
     let query;
     // Extracting the first word from brainInput for better comparison
+
     const command = brainInput.split(" ")[0].trim().toLowerCase();
-    console.log(command);
+
     if (command === "edit") {
       query = ` edit  """ ${response || input}"""`;
       inputData = ` edit  """ ${response || input}"""`;
@@ -258,15 +302,17 @@ const Chat = () => {
       handlePrint();
       return;
     } else if (command === "interpret") {
-      inputData = gpt_query(brainInput, input, history);
+      query = `${brainInput} of ${input} in hstml format in single div `;
     } else if (command === "list") {
       if (brainInput.toLowerCase().includes("comprehensive")) {
+        const _headings = await handleSave();
+
         const _format = await handleTemplate();
 
         if (input) {
           query = `${brainInput} of ${input}in format of ${_format} in html format in single div `;
         } else {
-          query = `${brainInput} of ${response}}in format of ${_format} in html format in single div `;
+          query = `${brainInput} of ${_headings}}in format of ${_format} in html format in single div `;
         }
 
         // query = gpt_query(brainInput, input, history, format);
@@ -289,22 +335,20 @@ const Chat = () => {
       }
     }
 
-    console.log(query);
     fetchData(query);
   };
 
   useEffect(() => {
     setBrainInput("");
     if (data) {
+      setPreviousResponse(response); // Store the previous response
       setResponse(data);
       setReports("");
-      console.log(response);
     }
   }, [data]);
 
   const handleClick = () => {
-    console.log("click");
-    setResponse(input);
+    setResponse(previousResponse);
   };
   function replaceHeaders(htmlContent) {
     if (!htmlContent) {
@@ -333,6 +377,7 @@ const Chat = () => {
     try {
       recognition.start();
       setStartRecording(true);
+      setIsBrainEngaged(true);
     } catch (error) {
       console.error("Error accessing microphone:", error);
     }
@@ -341,10 +386,13 @@ const Chat = () => {
   const stopMicrophone = () => {
     recognition.stop();
     setStartRecording(false);
+    setIsBrainEngaged(false);
   };
+
   const handleVoiceInput = (voiceInput) => {
     getBrainInput(voiceInput);
   };
+
   useEffect(() => {
     window.SpeechRecognition = window.webkitSpeechRecognition;
     const reg = new SpeechRecognition();
@@ -361,22 +409,29 @@ const Chat = () => {
     });
   }, []);
 
-  const handleBrainButtonClick = () => {
+  const handleBrainMic = () => {
     if (startRecording) {
       stopMicrophone();
-      // onBrainDisengage(); // Call the disengage function
       setIsBrainEngaged(false);
       return;
     }
     if (!brainInput && !startRecording) {
       startMicrophone();
       setIsBrainEngaged(true);
-      // onBrainEngage(); // Call the engage function
-    } else if (!startRecording && brainInput.length) {
-      console.log("query");
+    }
+  };
+
+  const handleBrainButtonClick = () => {
+    if (!startRecording && brainInput.length) {
       gptFunction();
     }
   };
+
+  let cursorPosition = 0;
+  function recordAtCursorPosition() {
+    const textArea = document.getElementById("textArea");
+    cursorPosition = textArea.selectionStart;
+  }
 
   return (
     <>
@@ -464,6 +519,8 @@ const Chat = () => {
                     }}
                   >
                     <div
+                      id="textArea"
+                      onClick={(e) => setResponse(e.target.innerHTML)}
                       dangerouslySetInnerHTML={{
                         __html: replaceHeaders(response),
                       }}
@@ -540,7 +597,7 @@ const Chat = () => {
               margin: "auto", // Add this line to center the div
             }}
           >
-            {/* <MicrophoneInput
+            <MicrophoneInput
               data={data}
               getVoiceInput={getVoiceInput}
               isLoading={isLoading}
@@ -549,8 +606,8 @@ const Chat = () => {
               isBrainEngaged={isBrainEngaged}
               previousInput={previousInput}
               addPreviouseInput={addPreviouseInput}
-            /> */}
-            <AWS_Mic
+            />
+            {/* <AWS_Mic
               getVoiceInput={getVoiceInput}
               isLoading={isLoading}
               isMicrophoneOn={isMicrophoneOn}
@@ -560,7 +617,7 @@ const Chat = () => {
               addPreviouseInput={addPreviouseInput}
               getChatInput={getChatInput}
               response={response}
-            />
+            /> */}
             <Box>
               <Button
                 disabled={isLoading || isMicrophoneOn}
@@ -599,7 +656,7 @@ const Chat = () => {
               justifyContent: "center",
               alignItems: "center",
               boxShadow: "10px 10px 15px rgba(0, 0, 0, 0.2)",
-              backgroundColor: "#FAFEFF", // Add this line for box shadow
+              backgroundColor: "#FAFEFF",
             }}
           >
             <div
@@ -639,18 +696,16 @@ const Chat = () => {
               /> */}
               <BrainButton
                 isLoading={isLoading}
+                isBrainEngaged={isBrainEngaged}
                 isMicrophoneOn={isMicrophoneOn}
+                handleMic={handleBrainMic}
                 handleClick={handleBrainButtonClick}
-                startRecording={startRecording}
+                startRecording={startMicrophone}
+                stopMicrophone={stopMicrophone}
               />
             </div>
           </div>
         </div>
-        <TitleModal
-          open={isModalOpen}
-          onClose={() => setIsModalOpen(false)}
-          response={data}
-        />
       </div>
     </>
   );

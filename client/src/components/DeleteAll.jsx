@@ -54,7 +54,6 @@ export default function DeleteAll({ open, onClose, id }) {
         config
       );
 
-      console.log("Record deleted successfully:", response);
       if (response.status === 200) {
         fetchTopics();
         onClose();

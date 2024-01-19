@@ -5,8 +5,8 @@ import { Navigate } from "react-router-dom";
 const AuthRoutes = ({ children }) => {
   const token = getAutToken();
 
-  if (token !== null) {
-    return <Navigate to="/home" />;
+  if (token === null) {
+    return <Navigate to="/login" />;
   }
 
   return <>{children}</>;

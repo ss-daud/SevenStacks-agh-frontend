@@ -84,10 +84,14 @@ export default function Login() {
           `${AUTH_URL}api/user/login`,
           apiObject
         );
-        console.log(response); // Log the entire response object
+
         if (response?.data?.token) {
           localStorage.setItem("token", response.data.token);
-          navigate("/home");
+          if (response.data.isPasswordActive === false) {
+            navigate("/change-password");
+          } else {
+            navigate("/home");
+          }
         } else {
           alert("Token not found in the response.");
         }
@@ -292,7 +296,7 @@ export default function Login() {
               )}
             </Button>
           </Box>
-          <Link to="/signup" style={{ textDecoration: "none" }}>
+          {/* <Link to="/signup" style={{ textDecoration: "none" }}>
             <Box
               sx={{
                 display: "flex",
@@ -328,7 +332,7 @@ export default function Login() {
                 Signup
               </Typography>
             </Box>
-          </Link>
+          </Link> */}
           <Link to="/forgotpassword" style={{ textDecoration: "none" }}>
             <Box sx={{ display: "flex", justifyContent: "center" }}>
               <Typography
