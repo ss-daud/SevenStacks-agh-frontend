@@ -132,7 +132,7 @@ export default function Login() {
                 color: "#023246",
               }}
             >
-              Login TEST
+              Login
             </Typography>
           </Box>
           <Box>
