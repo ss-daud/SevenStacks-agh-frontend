@@ -19,19 +19,19 @@ const useOpenAI = () => {
 
     try {
       const response = await openai.chat.completions.create({
-        model: "gpt-4",
+        model: "gpt-4-1106-preview",
         messages: [
           {
             role: "system",
             content:
-              "You are a physician that provides answers ready to be put in an electronic medical records system using the best practices in the medical field. Be concise, no editorial comments are needed, limit your answer to what is asked of you. Do not refer to external inputs from other physicians.",
+              "You are a physician that provides answers ready to be put in an electronic medical records system using the best practices in the medical field. Be concise, no editorial commands are needed, limit your answer to what is asked of you. Do not refer to external inputs from other physicians. Any answer should be provided as it would be entered in an EMR system by a physician.",
           },
           {
             role: "user",
             content: prompt,
           },
         ],
-        temperature: 0.1,
+        temperature: 0.5,
       });
 
       const messageContent = response.choices[0]?.message?.content;
