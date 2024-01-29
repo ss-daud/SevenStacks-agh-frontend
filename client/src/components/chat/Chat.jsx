@@ -303,7 +303,7 @@ const Chat = () => {
       return;
     } else if (command === "interpret") {
       query = `${brainInput} of ${input} in hstml format in single div `;
-    } else if (command === "list") {
+    } else if (command === "list" || command === "give") {
       if (brainInput.toLowerCase().includes("comprehensive")) {
         const _headings = await handleSave();
 
@@ -422,6 +422,15 @@ const Chat = () => {
   };
 
   const handleBrainButtonClick = () => {
+    if (!brainInput && !startRecording) {
+      startMicrophone();
+      setIsBrainEngaged(true);
+    }
+    if (startRecording) {
+      stopMicrophone();
+      setIsBrainEngaged(false);
+      return;
+    }
     if (!startRecording && brainInput.length) {
       gptFunction();
     }
@@ -520,7 +529,6 @@ const Chat = () => {
                   >
                     <div
                       id="textArea"
-                      onClick={(e) => setResponse(e.target.innerHTML)}
                       dangerouslySetInnerHTML={{
                         __html: replaceHeaders(response),
                       }}
