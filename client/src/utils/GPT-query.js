@@ -15,7 +15,10 @@ export const gpt_query = (brain, input, history, template) => {
 
 
   // Change 1: reduce cluter for testing a simple prompt
-  query = `${brain}: ${input}.`
+  //query = `${brain}: ${input}.`
+
+  // Change 2: Hard code SOAP command
+  query = `${brain} objective, subjective, assessment and include differential diagnosis, plan and include suggested testing, instruction letter to patient. Split the physical exam and to vital signs Including BMI and organs examined individually: ${input}`
 
 
 
