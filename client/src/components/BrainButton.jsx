@@ -22,35 +22,18 @@ const BrainButton = ({
         display: "flex",
       }}
     >
-      <Box sx={{ marginTop: "3px" }}>
-        {isBrainEngaged ? (
-          <Box
-            onClick={stopMicrophone}
-            sx={{ width: "100% ", marginTop: "3px" }}
-          >
-            <BrainMic />
-          </Box>
-        ) : (
-          <Box
-            sx={{
-              cursor: "pointer",
-            }}
-          >
-            <Button
-              onClick={startRecording}
-              disabled={isLoading || isMicrophoneOn}
-            >
-              <img src={img2} alt="microphone" height={35} width={35} />
-            </Button>
-          </Box>
-        )}
-      </Box>
-
       <Button
         onClick={handleClick}
         sx={{ cursor: "pointer" }}
         disabled={isLoading || isMicrophoneOn}
       >
+        {isBrainEngaged && (
+          <div className="pulse-ring3" style={{ left: 11, top: 1 }}></div>
+        )}
+        {isLoading && (
+          <div className="pulse-ring4" style={{ left: 11, top: 1 }}></div>
+        )}
+
         <Brain />
       </Button>
     </div>
