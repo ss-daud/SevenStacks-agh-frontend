@@ -17,8 +17,6 @@ export const gpt_query = (brain, input, history, template) => {
   // Change 1: reduce cluter for testing a simple prompt
   query = `${brain}: ${input}.`
 
-  // Change 2: format it for html
-  query += ' Response should only be in HTML format.'
 
 
 
