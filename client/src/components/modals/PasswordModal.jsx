@@ -109,7 +109,7 @@ export default function PasswordModal({ open, onClose }) {
       confirmPassword: "",
     },
     validationSchema: validationSchema,
-    onSubmit: async (values) => {
+    onSubmit: async (values, { resetForm }) => {
       if (values.newPassword !== values.confirmPassword) {
         alert("Passwords do not match");
       } else {
@@ -133,6 +133,7 @@ export default function PasswordModal({ open, onClose }) {
           );
           if (response.status == 200) {
             onClose();
+            resetForm();
           }
         } catch (err) {
           alert(err?.response?.data?.message);

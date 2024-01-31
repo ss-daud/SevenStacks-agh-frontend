@@ -21,7 +21,12 @@ const style = {
   boxShadow: 24,
 };
 
-export default function SuccessModal({ open, onClose }) {
+export default function SuccessModal({
+  open,
+  onClose,
+  isModalOpen,
+  setIsModalOpen,
+}) {
   const classes = useStyles();
 
   return (
@@ -29,7 +34,7 @@ export default function SuccessModal({ open, onClose }) {
       <Modal
         keepMounted
         open={open}
-        onClose={onClose}
+        onClose={() => setIsModalOpen(false)}
         aria-labelledby="keep-mounted-modal-title"
         aria-describedby="keep-mounted-modal-description"
       >
@@ -78,7 +83,7 @@ export default function SuccessModal({ open, onClose }) {
                 color: "#287094",
               }}
             >
-              Image uploaded Successfuly
+              Image uploaded Successfully
             </Typography>
           </Box>
         </Box>

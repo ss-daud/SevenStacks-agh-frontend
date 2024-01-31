@@ -317,24 +317,34 @@ const Chat = () => {
 
         // query = gpt_query(brainInput, input, history, format);
       } else {
+        console.log("give");
         const _value = response || input;
 
-        query = gpt_query(brainInput, input, history);
-
+        if (input) {
+          query = `${brainInput}  in html format  in detail of ${input}  `;
+          // query = gpt_query(brainInput, input, history);
+        }
+        if (response) {
+          query = `${brainInput}   in html format in detail of ${response}  `;
+          // query = gpt_query(brainInput, response, history);
+        }
         // inputData = `${brainInput} in details  in html format  in single div of ${
         //   response || input
         // } `;
       }
     } else {
       if (input) {
-        query = gpt_query(brainInput, input, history);
+        query = `${brainInput}  in html format in detail of ${input}  `;
+        // query = gpt_query(brainInput, input, history);
         // inputData = gpt_query(brainInput, input, history);
       } else {
+        query = `${brainInput} in html format in detail  of ${response}  `;
         // inputData = gpt_query(brainInput, response, history);
-        query = gpt_query(brainInput, response, history);
+        // query = gpt_query(brainInput, response, history);
       }
     }
 
+    console.log(query);
     fetchData(query);
   };
 

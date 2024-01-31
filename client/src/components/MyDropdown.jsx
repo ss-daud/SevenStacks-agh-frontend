@@ -82,7 +82,7 @@ const MyDropdown = ({ onLogout, onSettingsClick }) => {
                 marginLeft: 1,
               }}
             >
-              Setting
+              Settings
             </Typography>
           </Box>
           <Box

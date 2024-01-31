@@ -145,9 +145,8 @@ export default function ProfileModal({ open, onClose }) {
     onSubmit: async (values) => {
       const token = localStorage.getItem("token");
       if (image !== prevImage) {
+        console.log("image");
         const formData = new FormData();
-        formData.append("name", values.name);
-        formData.append("email", values.email);
         if (image) {
           formData.append("image", image);
         }
@@ -164,9 +163,10 @@ export default function ProfileModal({ open, onClose }) {
               },
             }
           );
-
+          console.log(response);
           if (response?.data?.message == "User updated successfully") {
             setIsModalOpen(true);
+            onClose();
           }
         } catch (error) {
           console.error("Error saving profile:", error);
@@ -174,6 +174,7 @@ export default function ProfileModal({ open, onClose }) {
           setLoader(false);
         }
       } else {
+        console.log("dsata");
         const formData = new FormData();
         formData.append("name", values.name);
         formData.append("email", values.email);
@@ -194,6 +195,12 @@ export default function ProfileModal({ open, onClose }) {
             onClose();
           }
         } catch (error) {
+          if (error.response && error.response.data) {
+            alert(error?.response?.data?.message);
+          } else {
+            console.error("Error saving profile:", error.message);
+          }
+
           console.error("Error saving profile:", error);
         } finally {
           setLoader(false);
@@ -480,6 +487,8 @@ export default function ProfileModal({ open, onClose }) {
       </Modal>
       <SuccessModal open={isModalOpen} onClose={() => setIsModalOpen(false)} />
       <PasswordModal
+        isModalOpen={isModalOpen}
+        setIsModalOpen={setIsModalOpen}
         open={isPasswordModalOpen}
         onClose={() => setIsPasswordModalOpen(false)}
       />
