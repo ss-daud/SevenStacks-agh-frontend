@@ -28,10 +28,11 @@ const BrainButton = ({
         disabled={isLoading || isMicrophoneOn}
       >
         {isBrainEngaged && (
-          <div className="pulse-ring3" style={{ left: 11, top: 1 }}></div>
+          <div className="pulse-ring3" style={{ left: 12, top: 1 }}></div>
         )}
         {isLoading && (
-          <div className="pulse-ring4" style={{ left: 11, top: 1 }}></div>
+          <div className="pulse-ring4" style={{ left: 12, top: 1 }}></div>
+
         )}
 
         <Brain />

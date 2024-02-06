@@ -88,6 +88,11 @@ export default function PasswordModal({ open, onClose }) {
     setShowNewPassword((show) => !show);
   };
 
+  const handleClose = () => {
+    onClose();
+    formik.resetForm();
+  };
+
   const handleKeyDown = (event) => {
     if (event.key === "Tab") {
       event.preventDefault();
@@ -109,7 +114,7 @@ export default function PasswordModal({ open, onClose }) {
       confirmPassword: "",
     },
     validationSchema: validationSchema,
-    onSubmit: async (values) => {
+    onSubmit: async (values, { resetForm }) => {
       if (values.newPassword !== values.confirmPassword) {
         alert("Passwords do not match");
       } else {
@@ -133,6 +138,7 @@ export default function PasswordModal({ open, onClose }) {
           );
           if (response.status == 200) {
             onClose();
+            resetForm();
           }
         } catch (err) {
           alert(err?.response?.data?.message);
@@ -409,7 +415,7 @@ export default function PasswordModal({ open, onClose }) {
             >
               <Button
                 variant="contained"
-                onClick={onClose}
+                onClick={handleClose}
                 style={{
                   marginBottom: 20,
                   backgroundColor: "#FFFFFF", // Replace with your custom color

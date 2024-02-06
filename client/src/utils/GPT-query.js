@@ -3,7 +3,7 @@ export const gpt_query = (brain, input, history, template) => {
     history ? history : ""
   } following the normal physical exam template ${template}"`;
 
-  let filter = `Add Filters : `;
+  let filter = `Add Filters  : `;
 
   filter += `Response should only be in HTML format. Also response should only generate result no other instructions.`;
   filter += "Response should not display that it is an html code like (```html ```)";
