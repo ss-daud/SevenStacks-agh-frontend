@@ -76,6 +76,7 @@ const Chat = () => {
   };
 
   const handleInputChange = (event) => {
+    console.log(event.target.value);
     setInput(event.target.value);
   };
 
@@ -116,10 +117,14 @@ const Chat = () => {
 
   const handleSubmit = async () => {
     const trimmedText = brainInput.replace(/^save as\s*/i, "");
+    if (trimmedText == "") {
+      alert("enter name to save");
+      return;
+    }
 
     const apiObject = {
       heading: trimmedText,
-      response: response || input,
+      response: response || input.replace(/(?:\r\n|\r|\n)/g, "<br>"),
     };
 
     const token = localStorage.getItem("token");
@@ -321,11 +326,11 @@ const Chat = () => {
         const _value = response || input;
 
         if (input) {
-          query = `${brainInput}  in html format  in detail of ${input}  `;
+          query = `${brainInput}   in html format in single div in detail of${input}  `;
           // query = gpt_query(brainInput, input, history);
         }
         if (response) {
-          query = `${brainInput}   in html format in detail of ${response}  `;
+          query = `${brainInput}  in html format in single div in detail of ${response}  `;
           // query = gpt_query(brainInput, response, history);
         }
         // inputData = `${brainInput} in details  in html format  in single div of ${
@@ -334,11 +339,11 @@ const Chat = () => {
       }
     } else {
       if (input) {
-        query = `${brainInput}  in html format in detail of ${input}  `;
+        query = `${brainInput}  in html format in single div in detail of ${input} `;
         // query = gpt_query(brainInput, input, history);
         // inputData = gpt_query(brainInput, input, history);
       } else {
-        query = `${brainInput} in html format in detail  of ${response}  `;
+        query = `${brainInput}  in html format in single div in detail of ${response}  `;
         // inputData = gpt_query(brainInput, response, history);
         // query = gpt_query(brainInput, response, history);
       }

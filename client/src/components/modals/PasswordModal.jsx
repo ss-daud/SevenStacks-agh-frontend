@@ -88,6 +88,11 @@ export default function PasswordModal({ open, onClose }) {
     setShowNewPassword((show) => !show);
   };
 
+  const handleClose = () => {
+    onClose();
+    formik.resetForm();
+  };
+
   const handleKeyDown = (event) => {
     if (event.key === "Tab") {
       event.preventDefault();
@@ -410,7 +415,7 @@ export default function PasswordModal({ open, onClose }) {
             >
               <Button
                 variant="contained"
-                onClick={onClose}
+                onClick={handleClose}
                 style={{
                   marginBottom: 20,
                   backgroundColor: "#FFFFFF", // Replace with your custom color
