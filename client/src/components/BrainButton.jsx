@@ -32,6 +32,7 @@ const BrainButton = ({
         )}
         {isLoading && (
           <div className="pulse-ring4" style={{ left: 12, top: 1 }}></div>
+
         )}
 
         <Brain />
