@@ -23,8 +23,8 @@ export const gpt_query = (brain, input, history, template) => {
 
   query = `Based on ${input}, ${brain}: Please generate a comprehensive medical report with the following structure and details:
 
-1. **Document Objective**: Briefly describe the purpose of this document.
-2. **Subjective Assessment**: Provide details of the patient's subjective symptoms and history.
+1. **Subjective Assessment**: Provide details of the patient's subjective symptoms and history.
+2. **Objective**: Briefly describe the purpose of this document.
 3. **Objective Assessment**: 
    - Split the physical examination details, including vital signs and BMI.
    - Describe organs examined individually.
