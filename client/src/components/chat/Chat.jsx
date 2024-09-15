@@ -534,27 +534,33 @@ const Chat = () => {
                   </div>
                 )}
                 {!isLoading && !error && response && (
-                  <div
-                    style={{
-                      overflowY: "auto",
-                      height: "calc(100vh - 200px)",
-                      padding: 10,
-                      border: "none",
-                    }}
-                  >
                     <div
-                      id="textArea"
-                      dangerouslySetInnerHTML={{
-                        __html: replaceHeaders(response),
-                      }}
-                      onBlur={(e) => setResponse(e.target.innerHTML)}
-                      contentEditable={true}
-                      style={{
-                        outline: "none",
-                        width: "100%",
-                      }}
-                    />
-                  </div>
+                        style={{
+                          overflowY: "auto",
+                          height: "calc(100vh - 200px)",
+                          padding: 10,
+                          border: "none",
+                        }}
+                    >
+                      <pre
+                          id="textArea"
+                          contentEditable={true}
+                          dangerouslySetInnerHTML={{
+                            __html: replaceHeaders(response.trim()), // Trim white spaces from the response.
+                          }}
+                          onBlur={(e) => setResponse(e.target.innerHTML)}
+                          style={{
+                            whiteSpace: "pre-wrap",   // Wraps text, respects newlines but removes excess space.
+                            wordWrap: "break-word",   // Prevents overflow of long words.
+                            margin: 0,                // No additional margins.
+                            padding: 0,               // No additional padding.
+                            outline: "none",          // No outline while editing.
+                            width: "100%",            // Full width for consistency.
+                            fontFamily: "inherit",    // Inherits the font from parent (you can customize this).
+                          }}
+                      />
+
+                    </div>
                 )}
 
                 {/* {reports.length > 0 && !response && (
@@ -575,11 +581,11 @@ const Chat = () => {
                   </div>
                 )} */}
                 {!isLoading && !error && !response && reports.length > 0 && (
-                  <div
-                    style={{
-                      overflowY: "auto",
-                      height: "calc(100vh - 200px)",
-                      padding: 10,
+                    <div
+                        style={{
+                          overflowY: "auto",
+                          height: "calc(100vh - 200px)",
+                          padding: 10,
                     }}
                   >
                     {reports?.map((item, key) => (
