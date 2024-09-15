@@ -48,7 +48,13 @@ const ConservationCard = ({ text, color, res, id }) => {
   };
 
   const handlePrint = () => {
-    const iframe = document.createElement("iframe");
+      // Get the current content of the big textbox
+      const currentContent = document.querySelector('#textArea')?.innerText;
+    if(!currentContent) {
+        currentContent = res;
+    }
+
+      const iframe = document.createElement("iframe");
     iframe.style.display = "none";
 
     iframe.srcdoc = `
@@ -66,7 +72,7 @@ const ConservationCard = ({ text, color, res, id }) => {
           </style>
         </head>
         <body>
-          <pre>${res}</pre>
+          <pre>${currentContent}</pre>
           <script type="text/javascript">
             // window.onload = function() {
             window.print();
@@ -102,7 +108,6 @@ const ConservationCard = ({ text, color, res, id }) => {
           borderRadius: "10px",
           backgroundColor: `${color}20`,
           justifyContent: "space-between",
-          backgroundColor: "rgba(88, 205, 47, 0.15)",
           alignItems: "center",
         }}
         style={{ cursor: "pointer" }}
