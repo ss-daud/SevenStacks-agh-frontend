@@ -1,5 +1,4 @@
 import React, { useState } from "react";
-import DOMPurify from "dompurify";
 import { Box, Typography } from "@mui/material";
 import img from "../assets/imgs/Message.png";
 import img1 from "../assets/imgs/Copy.png";
@@ -14,9 +13,11 @@ import Message from "../assets/svgs/Message";
 import Copy from "../assets/svgs/Copy";
 import Print from "../assets/svgs/Print";
 import Remove from "../assets/svgs/Remove";
+import axios from "axios";
+import {AUTH_URL} from "../api/index.js";
 
 const ConservationCard = ({ text, color, res, id }) => {
-  const { topics } = useTopic();
+  const { topics, fetchTopics } = useTopic();
   const [isHovered, setIsHovered] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
 
@@ -47,15 +48,41 @@ const ConservationCard = ({ text, color, res, id }) => {
     }
   };
 
-  const handlePrint = () => {
+  const handlePrint = async (id) => {
       // Get the current content of the big textbox
-      const currentContent = document.querySelector('#textArea')?.innerText;
+      let currentContent = document.querySelector('#textArea')?.innerText;
     if(!currentContent) {
         currentContent = res;
     }
 
+      const token = localStorage.getItem("token");
+      try {
+
+          // Update the record
+          const apiObject = {
+              response: currentContent
+          };
+
+          const response = await axios.put(`${AUTH_URL}api/topic/UpdateTopic/${id}`,
+              apiObject,
+              {
+                  headers: {
+                      Authorization: `Bearer ${token}`, // Append the token to the headers
+                      "Content-Type": "application/json",
+                  },
+              });
+          if (response.status === 200) {
+
+              // success
+              await fetchTopics();
+
+          }
+      } catch (error) {
+          console.error("Error updating record:", error);
+      }
+
       const iframe = document.createElement("iframe");
-    iframe.style.display = "none";
+      iframe.style.display = "none";
 
     iframe.srcdoc = `
       <html>
@@ -139,7 +166,7 @@ const ConservationCard = ({ text, color, res, id }) => {
           }}
         >
           <Box
-            onClick={handlePrint}
+            onClick={() => handlePrint(id)}
             style={{
               display: "flex",
               justifyContent: "center",

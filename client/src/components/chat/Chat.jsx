@@ -31,7 +31,7 @@ const Chat = () => {
     previousInput,
     setPreviousInput,
   } = useChatContext();
-  const { addTopic, topics } = useTopic();
+  const { addTopic, topics, fetchTopics } = useTopic();
   const isScreen = useMediaQuery("(max-width: 1100px)");
   const isLargeScreen = useMediaQuery("(min-width:2000px)");
   const { data, isLoading, error, fetchData } = useOpenAI();
@@ -143,6 +143,7 @@ const Chat = () => {
 
       if (response?.data?.newTopic) {
         addTopic(response?.data?.newTopic);
+        await fetchTopics();
       }
 
       updateChatInputs();
@@ -365,13 +366,20 @@ const Chat = () => {
   const handleClick = () => {
     setResponse(previousResponse);
   };
+
+  function decodeHtmlEntities(htmlContent) {
+    const textArea = document.createElement("textarea");
+    textArea.innerHTML = htmlContent;
+    return textArea.value;
+  }
   function replaceHeaders(htmlContent) {
     if (!htmlContent) {
       return;
     }
-
+// Decode the HTML entities to ensure proper processing
+    const decodedContent = decodeHtmlEntities(htmlContent);
     // Use regular expressions to replace h1, h2, and h3 with h4
-    const modifiedContent = htmlContent
+    const modifiedContent = decodedContent
       .replace(/<h1/g, "<h6")
       .replace(/<\/h1/g, "</h6")
       .replace(/<h2/g, "<h6")
@@ -381,7 +389,11 @@ const Chat = () => {
       .replace(/<h4/g, "<h6")
       .replace(/<\/h4/g, "</h6")
       .replace(/<h5/g, "<h6")
-      .replace(/<\/h5/g, "</h6");
+      .replace(/<\/h5/g, "</h6")
+        .replace(/<\s*div\s*>/g, "<div>")
+        .replace(/<\s*\/\s*div\s*>/g, "</div>")
+        // Handle other potential tags like spans similarly if needed
+        .replace(/<\s*br\s*>/g, "<br>");
     return modifiedContent;
   }
 
