@@ -203,34 +203,6 @@ const Chat = () => {
     }
   };
 
-  const handleInputCommand = async (topicCommand) => {
-
-    const apiObject = {
-      topicCommand: topicCommand
-    };
-
-    const token = localStorage.getItem("token");
-
-    try {
-      const response = await axios.post(
-          `${AUTH_URL}api/topic/saveTopicCommand`,
-          apiObject,
-          {
-            headers: {
-              Authorization: `Bearer ${token}`, // Append the token to the headers
-              "Content-Type": "application/json",
-            },
-          }
-      );
-
-      if(response.status == 200) {
-        console.log("c saved successfully");
-      }
-
-    } catch (error) {
-      console.error("Error saving command:", error);
-    }
-  };
   const handleTemplate = async () => {
     // let trimmedText;
     // if (brainInput.toLowerCase().includes("review of system")) {
