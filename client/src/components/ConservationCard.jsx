@@ -74,7 +74,7 @@ const ConservationCard = ({ text, color, res, id }) => {
                     },
                 });
             if (response.status === 200) {
-
+                alert("record save successfully.");
                 // success
                 await fetchTopics();
 
