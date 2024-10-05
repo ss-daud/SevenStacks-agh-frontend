@@ -12,6 +12,7 @@ import EllipsisText from "./text/EllipsiText";
 import Message from "../assets/svgs/Message";
 import Copy from "../assets/svgs/Copy";
 import Print from "../assets/svgs/Print";
+import Save from "../assets/svgs/Save";
 import Remove from "../assets/svgs/Remove";
 import axios from "axios";
 import {AUTH_URL} from "../api/index.js";
@@ -48,6 +49,42 @@ const ConservationCard = ({ text, color, res, id }) => {
     }
   };
 
+    const handleSave = async (id) => {
+
+        // Get the current content of the big textbox
+        let currentContent = document.querySelector('#textArea')?.innerText;
+        if(!currentContent) {
+            currentContent = res;
+        }
+
+        const token = localStorage.getItem("token");
+        try {
+
+            // Update the record
+            const apiObject = {
+                response: currentContent
+            };
+
+            const response = await axios.put(`${AUTH_URL}api/topic/UpdateTopic/${id}`,
+                apiObject,
+                {
+                    headers: {
+                        Authorization: `Bearer ${token}`, // Append the token to the headers
+                        "Content-Type": "application/json",
+                    },
+                });
+            if (response.status === 200) {
+
+                // success
+                await fetchTopics();
+
+            }
+        } catch (error) {
+            console.error("Error updating record:", error);
+        }
+
+    };
+
   const handlePrint = async (id) => {
       // Get the current content of the big textbox
       let currentContent = document.querySelector('#textArea')?.innerText;
@@ -55,31 +92,6 @@ const ConservationCard = ({ text, color, res, id }) => {
         currentContent = res;
     }
 
-      const token = localStorage.getItem("token");
-      try {
-
-          // Update the record
-          const apiObject = {
-              response: currentContent
-          };
-
-          const response = await axios.put(`${AUTH_URL}api/topic/UpdateTopic/${id}`,
-              apiObject,
-              {
-                  headers: {
-                      Authorization: `Bearer ${token}`, // Append the token to the headers
-                      "Content-Type": "application/json",
-                  },
-              });
-          if (response.status === 200) {
-
-              // success
-              await fetchTopics();
-
-          }
-      } catch (error) {
-          console.error("Error updating record:", error);
-      }
 
       const iframe = document.createElement("iframe");
       iframe.style.display = "none";
@@ -165,6 +177,16 @@ const ConservationCard = ({ text, color, res, id }) => {
             gap: "4px",
           }}
         >
+            <Box
+                onClick={() => handleSave(id)}
+                style={{
+                    display: "flex",
+                    justifyContent: "center",
+                    alignItems: "center",
+                }}
+            >
+                <Save />
+            </Box>
           <Box
             onClick={() => handlePrint(id)}
             style={{
