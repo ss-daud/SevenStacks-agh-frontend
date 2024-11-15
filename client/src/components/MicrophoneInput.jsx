@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 
-import { Box, Button, useMediaQuery } from "@mui/material";
+import { Box, Button, useMediaQuery, FormControl, Select, MenuItem } from "@mui/material";
 import img1 from "../assets/imgs/mic.png";
 import Mike from "./Mike/Mike";
 
@@ -14,6 +14,7 @@ const MicrophoneInput = ({
   addPreviouseInput,
 }) => {
   const [attached, setAttached] = useState(false);
+  const [selectedLanguage, setSelectedLanguage] = useState("en-US")
   const [audioStream, setAudioStream] = useState(null);
   const [isMicrophoneActive, setIsMicrophoneActive] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -57,11 +58,12 @@ const MicrophoneInput = ({
   };
 
   const stopMicrophone = () => {
+    recognition.stop();
     setIsMicrophoneActive(false);
     onStatusChange(false);
-    recognition.stop();
     recognition.removeEventListener("result", handleInput);
-    addPreviouseInput();
+    // addPreviouseInput();
+    console.log("Microphone is stopped");
   };
 
   useEffect(() => {
@@ -71,17 +73,37 @@ const MicrophoneInput = ({
       reg = new SpeechRecognition();
       reg.interimResults = true;
       reg.continuous = true;
+      reg.lang = selectedLanguage
 
       setRecognition(reg);
+      reg.addEventListener("result", (e) => handleInput(e, previousInput));
     } else {
       console.error("Web Speech API is not supported in this browser.");
     }
-  }, [previousInput]);
+  }, [selectedLanguage, previousInput]);
 
   return (
     <>
       <div>
-        <Box style={{ marginBottom: 10 }}>
+        <FormControl style={{ marginBottom: 16, marginLeft: 10, background: selectedLanguage ? '#E0F7FA' : 'transparent' }}>
+          <Select
+            labelId="language-select-label"
+            id="language-select"
+            value={selectedLanguage}
+            label="Language"
+            onChange={(e) => {
+              if (!isMicrophoneActive) {
+                setSelectedLanguage(e.target.value);
+              }
+            }}
+          >
+            <MenuItem value="ar-SA">AR</MenuItem>
+            <MenuItem value="en-US">EN</MenuItem>
+          </Select>
+        </FormControl>
+      </div>
+      <div>
+        <Box style={{ marginBottom: 10, }}>
           {isMicrophoneActive ? (
             <Box onClick={stopMicrophone}>
               <Mike />
