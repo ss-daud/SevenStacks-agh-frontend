@@ -355,6 +355,11 @@ const Chat = () => {
     fetchData(query);
   };
 
+  const handleGptQuery=(text)=>{
+    const query=`${text} ${input}`
+    fetchData(query);
+  }
+
   useEffect(() => {
     setBrainInput("");
     if (data) {
@@ -639,6 +644,70 @@ const Chat = () => {
               margin: "auto", // Add this line to center the div
             }}
           >
+          <div
+              style={{
+                marginBottom: "20px",
+                display: "flex",
+                flexDirection: "column",
+                alignItems: "center",
+              }}
+            >
+              <Button
+               variant="outlined"
+               style={{
+                marginBottom: "10px",
+                borderRadius: "50%", 
+                width: "50px", 
+                height: "50px", 
+                minWidth: "50px", 
+                padding: "0",
+                backgroundColor: "#CDE0EA", 
+                color: "#023246", 
+              }}
+              onClick={()=>{
+               handleGptQuery("healthCheck - 1")  
+              }}
+              >
+                T1
+              </Button>
+              <Button
+                 variant="outlined"
+                 style={{
+                  marginBottom: "10px",
+                  borderRadius: "50%", 
+                  width: "50px", 
+                  height: "50px", 
+                  minWidth: "50px", 
+                  padding: "0",
+                  backgroundColor: "#CDE0EA ", 
+                  color: "#023246", 
+                }}
+                onClick={()=>{
+                  handleGptQuery("healthCheck - 2") 
+                }}
+              >
+                T2
+              </Button>
+              <Button
+               variant="outlined"
+               style={{
+                marginBottom: "10px",
+                borderRadius: "50%", 
+                width: "50px", 
+                height: "50px", 
+                minWidth: "50px", 
+                padding: "0",
+                backgroundColor: "#CDE0EA",
+                color: "#023246",      
+
+              }}
+              onClick={()=>{
+                handleGptQuery("healthCheck - 3")
+              }}
+              >
+                T3
+              </Button>
+            </div>
             <MicrophoneInput
               data={data}
               getVoiceInput={getVoiceInput}
