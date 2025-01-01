@@ -665,7 +665,17 @@ const Chat = () => {
                 color: "#023246", 
               }}
               onClick={()=>{
-               handleGptQuery("healthCheck - 1")  
+               handleGptQuery(`Format the document in separate paragraphs
+                              Do not document allergies or a home medications
+                              Strictly follow this order throughout the document
+                              Start by documenting in bullet points patient’s name date of birth and date of visit, physician name at the top of the report
+                              Next document chief complaint or reason for visit.  Then leave blank line
+                              Next document Subjective or HPI in a paragraph form.  Then leave a blank line
+                              Always start the subjective or HPI with age and gender 
+                              Document The objective in a bullet points format.  Leave a blank line after the objective section
+                              Calculate and Include BMI with the vital signs section and leave a blank line between BMI and the rest of the physical examination.  Document the BMI value only and do not document the calculation process.  Document the interpretation of the BMI next to the BMI value 
+                              Document detailed physical examination of at least 6 systems.   Do not summarize any section as normal Document a full description of each system. Modify any abnormal findings in the physical exam from the context above.  In the cardiac exam document at a minimum rate and rhythm and abnormal heart sounds and in the lung exam document at a minimum the breath sounds and chest movement and abdominal exam at a minimum document any organomegaly tenderness texture of the abdomen and for the extremities examination documented a minimum any swelling cyanosis or clubbing and in the neuro exam document at a minimum level of alertness muscle strength and balance.  Then leave a blank line then document assessment and plan in bullet format
+                              `)  
               }}
               >
                 SOAP
@@ -683,7 +693,31 @@ const Chat = () => {
                   color: "#023246", 
                 }}
                 onClick={()=>{
-                  handleGptQuery("healthCheck - 2") 
+                  handleGptQuery(`Format the document in separate paragraphs
+                                  Strictly follow this order throughout the document
+
+                                  Start by documenting in bullet points patient’s name date of birth and date of visit, physician name at the top of the report
+                                  Next document chief complaint or reason for visit.  Then leave blank line
+                                  Next document Subjective or HPI in a paragraph form.  Then leave a blank line
+                                  Always start the subjective or HPI with age and gender 
+                                  Next Document PMH in bullet format.  Leave blank line after PMH section
+                                  Next document family history a family history not documented reported as noncontributory
+                                  Next document detailed 12 systems review of symptoms in bullet format based on information presented. Document each system separately on comprehensively. Do not summarize the review of systems as normal or negative. then leave a blank line
+                                  Next Document social history in bullet format.  Leave a blank line after social history section
+                                  Next Document home medications in bullet format.  Leave a blank line after home medications section 
+                                  Next Document allergies in bullet format.  Leave a blank line after allergies section
+                                  Document The objective in a bullet points format.  Leave a blank line after the objective section
+                                  Calculate and Include BMI with the vital signs section and leave a blank line between BMI and the rest of the physical examination.  Document the BMI value only and do not document the calculation process.  Document the interpretation of the BMI next to the BMI value 
+
+                                  Document detailed physical examination of at least 6 systems.   Do not summarize any section as normal Document a full description of each system. Modify any abnormal findings in the physical exam from the context above.  In the cardiac exam document at a minimum rate and rhythm and abnormal heart sounds and in the lung exam document at a minimum the breath sounds and chest movement and abdominal exam at a minimum document any organomegaly tenderness texture of the abdomen and for the extremities examination documented a minimum any swelling cyanosis or clubbing and in the neuro exam document at a minimum level of alertness muscle strength and balance.  Then leave a blank line
+                                  Document as a physician would in the following order, patient name followed by date of birth followed by date of visit followed by examining physician followed by chief complaint followed by history of present illness followed by past medical history followed by review of systems followed by home medications followed by allergies followed by social history followed by family history followed by vital signs and weight and height and BMI followed by physical examination followed by impression and plan.
+                                  Combine the assessment and plan in 1 section that reports and incorporates in the clinical context all labs or tests or echocardiogram or x-rays or CAT scans including all details
+                                  Include expanded differential diagnosis using medical terms and expansive list.  For each differential diagnosis Suggest further testing in a specific way using medical terms and recommend medications in a specific and expansive way.  In the assessment/plan section include suggested testing, suggested treatment.  In assessment/plan section include suggested medications and tests in the assessment/plan section Suggest any serious current medication side effects or drug interaction in the assessment/plan section.  
+                                  In the assessment and plan section, and on any abnormal vital signs or any abnormal BMI and point heart a
+                                  Document Medications of the same category the patient is taking and any interaction between the medications the patient is taking only in the assessment/plan section and suggest any action
+                                  Document differential diagnosis and drug interactions and further testing only in the assessment/plan section and suggest any action
+                                  End each report with Ahmed Badr, MD, FCCP
+                                  `) 
                 }}
               >
                 COMP
@@ -702,7 +736,38 @@ const Chat = () => {
 
               }}
               onClick={()=>{
-                handleGptQuery("healthCheck - 3")
+                handleGptQuery(`Format the document in separate paragraphs
+                                  Strictly follow this order throughout the document
+                                  Combine the entire text as instructed below. Do not repeat any data points or any statements that have no conflict. Interpret in full all the lab results and emphasize their interpretation in the clinical context given and interpret the x-rays and other data points including the vital signs in the context of the clinical situation document all interpretations in assessment and plan segment. Start by documenting in bullet points patient’s name date of birth and date of visit, physician name at the top of the report
+                                  Next document chief complaint or reason for visit.
+                                  Then leave blank line
+                                  Next document Subjective or HPI in a paragraph form.
+                                  Then leave a blank line
+                                  Always start the subjective or HPI with age and gender 
+                                  Next Document PMH in bullet format.
+                                  Then Leave blank line 
+                                  Next document family history if family history is not documented report as noncontributory
+                                  Then leave blank line
+                                  Next document detailed 12 systems review of symptoms in bullet format based on information presented.
+                                  Then leave a blank line. Do not summarize the review of systems as normal or negative
+                                  Then leave blank line
+                                  Next Document social history in bullet format.
+                                  Then Leave a blank line
+                                  Next Document home medications in bullet format.
+                                  Then Leave a blank line 
+                                  Next Document allergies in bullet format.
+                                  Then Leave a blank line 
+                                  Document The objective in a bullet points format.
+                                  Then Leave a blank line 
+                                  Calculate and Include BMI with the vital signs section and leave a blank line between BMI and the rest of the physical examination. Document the BMI value only and do not document the calculation process. Document the interpretation of the BMI next to the BMI value 
+                                  Then Leave blank line
+                                  Document detailed physical examination of at least 6 systems. Do not summarize any section as normal Document a full description of each system. Modify any abnormal findings in the physical exam from the context above. In the head exam, and at least on the eye exam any skin rash and call abnormalities and in the neck exam, and at least on lymph nodes and jugular veins and any neck stiffness In the cardiac exam document at a minimum rate and rhythm and abnormal heart sounds and in the lung exam document at a minimum the breath sounds and chest movement and abdominal exam at a minimum document any organomegaly tenderness texture of the abdomen and for the extremities examination documented a minimum any swelling cyanosis or clubbing and in the neuro exam document at a minimum level of alertness muscle strength and balance. 
+                                  Then leave a blank line
+                                  Document as a physician would in the following order, patient name followed by date of birth followed by date of visit followed by examining physician followed by chief complaint followed by history of present illness followed by past medical history followed by review of systems followed by home medications followed by allergies followed by social history followed by family history followed by vital signs and weight and height and BMI followed by physical examination followed by impression and plan.
+                                  Combine the assessment and plan in 1 section that reports and incorporates in the clinical context all labs or tests or echocardiogram or x-rays or CAT scans including all details
+                                  Include expanded differential diagnosis using medical terms and expansive list and suggest further testing in a specific way using medical terms and recommend medications in a specific and expansive way. In the assessment/plan section include suggested testing, suggested treatment. In assessment/plan section include suggested medications and tests in the assessment/plan section Suggest any serious current medication side effects or drug interaction in the assessment/plan section. 
+                                  Answer any questions documented in the text 
+                                  Only document differential diagnosis or drug interactions or further testing in the assessment/plan section. Combine the entire text as instructed above. Do not repeat any data points or any statements that have no conflict. Interpret in full all the lab results and emphasize their interpretation in the clinical context given and interpret the x-rays and other data points including the vital signs in the context of the clinical situation document all interpretations in assessment and plan segment`)
               }}
               >
                 SUPR
