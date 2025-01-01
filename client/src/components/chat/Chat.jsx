@@ -668,7 +668,7 @@ const Chat = () => {
                handleGptQuery("healthCheck - 1")  
               }}
               >
-                T1
+                SOAP
               </Button>
               <Button
                  variant="outlined"
@@ -686,7 +686,7 @@ const Chat = () => {
                   handleGptQuery("healthCheck - 2") 
                 }}
               >
-                T2
+                COMP
               </Button>
               <Button
                variant="outlined"
@@ -705,7 +705,7 @@ const Chat = () => {
                 handleGptQuery("healthCheck - 3")
               }}
               >
-                T3
+                SUPR
               </Button>
             </div>
             <MicrophoneInput
