@@ -40,6 +40,7 @@ const Chat = () => {
   const [isMicrophoneOn, setIsMicrophoneOn] = useState(false);
   const [isBrainEngaged, setIsBrainEngaged] = useState(false);
   const [previousResponse, setPreviousResponse] = useState("");
+  const [adminStatus, setAdminStatus] = useState();
   const responseRef = useRef(null);
 
   const [previous, setPrevious] = useState("");
@@ -475,6 +476,24 @@ const Chat = () => {
     cursorPosition = textArea.selectionStart;
   }
 
+  const fetchDataFromAPI = async () => {
+    try {
+      // Make an API call to fetch the user's data
+      const token = localStorage.getItem("token");
+      const response = await axios.get(`${AUTH_URL}api/user/get`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+      setAdminStatus(response?.data?.user?.isAdmin);
+    } catch (error) {
+      console.error("Error fetching profile data:", error);
+    }
+  };
+  useEffect(() => {
+    fetchDataFromAPI();
+  }, []);
+
   return (
     <>
       <div
@@ -810,56 +829,58 @@ const Chat = () => {
           </Box>
         </Box>
 
-        <div
-          style={{
-            width: "100%",
-            display: "flex",
-            justifyContent: "center",
-            alignItems: "flex-start",
-          }}
-        >
-          <div
-            style={{
-              width: isScreen ? "90%" : "100%",
-              borderRadius: "15px",
-              height: "50px",
-              border: "1px solid #808080",
-              marginLeft: "10px",
-              marginRight: isScreen ? "11%" : "5.5%",
-              marginBottom: 15,
-              display: "flex",
-              flexDirection: "column",
-              justifyContent: "center",
-              alignItems: "center",
-              boxShadow: "10px 10px 15px rgba(0, 0, 0, 0.2)",
-              backgroundColor: "#FAFEFF",
-            }}
-          >
+        {
+          adminStatus ?
             <div
               style={{
                 width: "100%",
                 display: "flex",
-                height: "100%",
-                alignItems: "center",
+                justifyContent: "center",
+                alignItems: "flex-start",
               }}
             >
-              <TextField
-                variant="standard"
-                placeholder="Chat with AI ...."
-                onChange={(e) => {
-                  setBrainInput(e.target.value);
-                }}
-                value={brainInput}
+              <div
                 style={{
-                  width: "100%",
-                  padding: "1%",
+                  width: isScreen ? "90%" : "100%",
+                  borderRadius: "15px",
+                  height: "50px",
+                  border: "1px solid #808080",
+                  marginLeft: "10px",
+                  marginRight: isScreen ? "11%" : "5.5%",
+                  marginBottom: 15,
+                  display: "flex",
+                  flexDirection: "column",
+                  justifyContent: "center",
+                  alignItems: "center",
+                  boxShadow: "10px 10px 15px rgba(0, 0, 0, 0.2)",
+                  backgroundColor: "#FAFEFF",
                 }}
-                InputProps={{ disableUnderline: true }}
-                InputLabelProps={{
-                  style: { color: "#023246" },
-                }}
-              />
-              {/* <Brain_Mic
+              >
+                <div
+                  style={{
+                    width: "100%",
+                    display: "flex",
+                    height: "100%",
+                    alignItems: "center",
+                  }}
+                >
+                  <TextField
+                    variant="standard"
+                    placeholder="Chat with AI ...."
+                    onChange={(e) => {
+                      setBrainInput(e.target.value);
+                    }}
+                    value={brainInput}
+                    style={{
+                      width: "100%",
+                      padding: "1%",
+                    }}
+                    InputProps={{ disableUnderline: true }}
+                    InputLabelProps={{
+                      style: { color: "#023246" },
+                    }}
+                  />
+                  {/* <Brain_Mic
                 value={brainInput}
                 gptFunction={gptFunction}
                 getBrainInput={getBrainInput}
@@ -882,6 +903,9 @@ const Chat = () => {
             </div>
           </div>
         </div>
+            :
+            <div></div>
+        }
       </div>
     </>
   );

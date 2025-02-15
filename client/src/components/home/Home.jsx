@@ -16,7 +16,7 @@ const Home = () => {
         <ChatContextProvider>
           <div
             style={{
-              width: "100%",
+              width: "98%",
               height: "100vh",
 
               // backgroundColor: darkMode ? "#1a1a1a" : "#ffffff",
