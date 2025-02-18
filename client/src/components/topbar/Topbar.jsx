@@ -15,8 +15,10 @@ import { ChatContextProvider, useChatContext } from "../../context/ChatContext";
 import { TopicProvider } from "../../context/TopicContext";
 import { SidebarProvider, useSidebar } from "../../context/SidebarContext";
 import { AUTH_URL } from "../../api";
+import GreetComp from "../Greeting/GreetComp";
 const Topbar = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [username, setusername] = useState("");
   const { isSidebarOpen, toggleSidebar } = useSidebar();
   const [image, setImage] = useState();
   const { darkMode, toggleDarkMode } = useTheme();
@@ -29,7 +31,7 @@ const Topbar = () => {
 
     navigate("/");
   };
-
+console.log("username", username);
   const fetchDataFromAPI = async () => {
     try {
       // Make an API call to fetch the user's data
@@ -44,6 +46,9 @@ const Topbar = () => {
         setImage(
           `https://ai-emr.s3.amazonaws.com/profile-images/${response?.data?.user?.userImage}`
         );
+      }
+      else if (response?.data.user?.username){
+        setusername(response?.data.user?.username);
       }
     } catch (error) {
       console.error("Error fetching profile data:", error);
@@ -63,9 +68,10 @@ const Topbar = () => {
                 height: 50,
                 width: "100%",
                 display: "flex",
-                justifyContent: "flex-end",
+                justifyContent: "space-between",
                 alignItems: "center",
                 borderBottom: "2px solid #F6F6F6",
+                marginLeft: 50,
               }}
             >
               {/* <IconButton
@@ -75,8 +81,9 @@ const Topbar = () => {
             >
               {darkMode ? <DarkModeIcon /> : <MdOutlineLightMode />}
             </IconButton> */}
-
-              <div
+            <GreetComp username={username}/>
+            <div style={{display: 'flex'}}>
+            <div
                 style={{
                   height: 31,
                   width: 31,
@@ -106,6 +113,7 @@ const Topbar = () => {
                 onSettingsClick={handleSettingsChange}
                 onLogout={handleLogout}
               />
+            </div>
             </div>
             <div style={{ display: "flex", flexDirection: "row" }}>
               <div
