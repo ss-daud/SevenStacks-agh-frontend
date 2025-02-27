@@ -17,6 +17,12 @@ import { useTopic } from "../../context/TopicContext";
 import { gpt_query } from "../../utils/GPT-query";
 import { useTheme } from "@mui/material/styles";
 import AWS_Mic from "../AWS Mic/AWS_Mic";
+import Save from "../../assets/svgs/Save";
+import Print from "../../assets/svgs/Print";
+import Copy from "../../assets/svgs/Copy";
+import Remove from "../../assets/svgs/Remove";
+import { useButton } from "../../context/SaveButtonContext";
+import Emr from "../../assets/svgs/Emr";
 
 const Chat = () => {
   const {
@@ -34,7 +40,7 @@ const Chat = () => {
   const { addTopic, topics, fetchTopics } = useTopic();
   const isScreen = useMediaQuery("(max-width: 1100px)");
   const isLargeScreen = useMediaQuery("(min-width:2000px)");
-  const { data, isLoading, error, fetchData } = useOpenAI();
+  const { data, record, isLoading, error, fetchData, fetchRecord, setRecord } = useOpenAI();
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [title, setTitle] = useState([]);
   const [isMicrophoneOn, setIsMicrophoneOn] = useState(false);
@@ -42,6 +48,7 @@ const Chat = () => {
   const [previousResponse, setPreviousResponse] = useState("");
   const [adminStatus, setAdminStatus] = useState();
   const responseRef = useRef(null);
+  const { button, editButton, newButton, editButtoniD } = useButton();
 
   const [previous, setPrevious] = useState("");
 
@@ -94,6 +101,8 @@ const Chat = () => {
     }
   };
 
+
+
   const getChatInput = (value) => {
     const cursorPosition = getCursorPosition();
     if (cursorPosition !== -1) {
@@ -117,15 +126,14 @@ const Chat = () => {
   };
 
   const handleSubmit = async () => {
-    const trimmedText = brainInput.replace(/^save as\s*/i, "");
-    if (trimmedText == "") {
-      alert("enter name to save");
-      return;
-    }
+
+    const DataRes = await fetchRecord(response);
+
+    console.log("<---R E C O R D S--->", DataRes)
 
     const apiObject = {
-      heading: trimmedText,
       response: response || input.replace(/(?:\r\n|\r|\n)/g, "<br>"),
+      record:   DataRes,
     };
 
     const token = localStorage.getItem("token");
@@ -136,7 +144,7 @@ const Chat = () => {
         apiObject,
         {
           headers: {
-            Authorization: `Bearer ${token}`, // Append the token to the headers
+            Authorization: `Bearer ${token}`,
             "Content-Type": "application/json",
           },
         }
@@ -148,9 +156,49 @@ const Chat = () => {
       }
 
       updateChatInputs();
+      setRecord('');
     } catch (error) {
       console.error("Error saving profile:", error);
     }
+  };
+
+  const handleChatPrint = async () => {
+    // Get the current content of the big textbox
+    let currentContent = document.querySelector('#textArea')?.innerText;
+    if (!currentContent) {
+      currentContent = res;
+    }
+
+
+    const iframe = document.createElement("iframe");
+    iframe.style.display = "none";
+
+    iframe.srcdoc = `
+      <html>
+        <head>
+          <title>Print</title>
+          <style>
+            body {
+              font-family: 'Arial', sans-serif;
+              margin: 0;
+            }
+            pre {
+              white-space: pre-wrap; /* Preserve white space */
+            }
+          </style>
+        </head>
+        <body>
+          <pre>${currentContent}</pre>
+          <script type="text/javascript">
+            // window.onload = function() {
+            window.print();
+            // };
+          </script>
+        </body>
+      </html>
+    `;
+
+    document.body.appendChild(iframe);
   };
 
   const handlePrint = async () => {
@@ -185,6 +233,43 @@ const Chat = () => {
     }
   };
 
+  const editButtonClick = async (id) => {
+
+    // Get the current content of the big textbox
+    let currentContent = document.querySelector('#textArea')?.innerText;
+    if (!currentContent) {
+      currentContent = res;
+    }
+
+    const token = localStorage.getItem("token");
+    try {
+
+      // Update the record
+      const apiObject = {
+        id: id,
+        response: currentContent
+      };
+
+      const response = await axios.put(`${AUTH_URL}api/topic/UpdateTopic/${id}`,
+        apiObject,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "application/json",
+          },
+        });
+      if (response.status === 200) {
+        alert("Record saved successfully.");
+        // success
+        await fetchTopics();
+        updateChatInputs();
+      }
+    } catch (error) {
+      console.error("Error updating record:", error);
+    }
+
+  };
+
   const handleSave = async () => {
     const token = localStorage.getItem("token");
     try {
@@ -202,6 +287,7 @@ const Chat = () => {
     } catch (error) {
       alert("Error: no template exists for this name");
     }
+    console.log("Handle Save")
   };
 
   const handleTemplate = async () => {
@@ -356,15 +442,15 @@ const Chat = () => {
     fetchData(query);
   };
 
-  const handleGptQuery=(text)=>{
-    const query=`${text} ${input}`
+  const handleGptQuery = (text) => {
+    const query = `${text} ${input}`
     fetchData(query);
   }
 
   useEffect(() => {
     setBrainInput("");
     if (data) {
-      setPreviousResponse(response); // Store the previous response
+      setPreviousResponse(response);
       setResponse(data);
       setReports("");
     }
@@ -383,7 +469,7 @@ const Chat = () => {
     if (!htmlContent) {
       return;
     }
-// Decode the HTML entities to ensure proper processing
+    // Decode the HTML entities to ensure proper processing
     const decodedContent = decodeHtmlEntities(htmlContent);
     // Use regular expressions to replace h1, h2, and h3 with h4
     const modifiedContent = decodedContent
@@ -397,10 +483,10 @@ const Chat = () => {
       .replace(/<\/h4/g, "</h6")
       .replace(/<h5/g, "<h6")
       .replace(/<\/h5/g, "</h6")
-        .replace(/<\s*div\s*>/g, "<div>")
-        .replace(/<\s*\/\s*div\s*>/g, "</div>")
-        // Handle other potential tags like spans similarly if needed
-        .replace(/<\s*br\s*>/g, "<br>");
+      .replace(/<\s*div\s*>/g, "<div>")
+      .replace(/<\s*\/\s*div\s*>/g, "</div>")
+      // Handle other potential tags like spans similarly if needed
+      .replace(/<\s*br\s*>/g, "<br>");
     return modifiedContent;
   }
 
@@ -500,11 +586,35 @@ const Chat = () => {
       console.error("Error fetching buttons data:", error);
     }
   }
+  const handleCopyToClipboard = (contentToCopy) => {
+    // Create a temporary textarea element to hold the text to copy
+    const textArea = document.createElement("textarea");
 
-  const handlebuttonSubmit = async (name) =>{
+    // Check if the content is HTML code
+    if (contentToCopy.startsWith("<")) {
+      const tempElement = document.createElement("div");
+      tempElement.innerHTML = contentToCopy;
+      textArea.value = tempElement.innerText;
+    } else {
+      textArea.value = contentToCopy;
+    }
+    document.body.appendChild(textArea);
+    textArea.select();
+
+    try {
+      document.execCommand("copy");
+      alert("Copied successfully");
+    } catch (err) {
+      console.error("Failed to copy text: ", err);
+    } finally {
+      document.body.removeChild(textArea);
+    }
+  };
+
+  const handlebuttonSubmit = async (name) => {
+    newButton();
     const buttonDataonClick = buttonData.find(x => x.name === name);
     handleGptQuery(buttonDataonClick.text);
-    console.log(buttonDataonClick, "TEXT");
   }
   useEffect(() => {
     fetchbuttonsData();
@@ -588,34 +698,35 @@ const Chat = () => {
                   </div>
                 )}
                 {!isLoading && !error && response && (
-                    <div
-                        style={{
-                          overflowY: "auto",
-                          height: "calc(100vh - 200px)",
-                          padding: 10,
-                          border: "none",
-                        }}
-                    >
-                      <pre
-                          id="textArea"
-                          contentEditable={true}
-                          dangerouslySetInnerHTML={{
-                            __html: replaceHeaders(response.trim()), // Trim white spaces from the response.
-                          }}
-                          onBlur={(e) => setResponse(e.target.innerHTML)}
-                          style={{
-                            whiteSpace: "pre-wrap",   // Wraps text, respects newlines but removes excess space.
-                            wordWrap: "break-word",   // Prevents overflow of long words.
-                            margin: 0,                // No additional margins.
-                            padding: 0,               // No additional padding.
-                            outline: "none",          // No outline while editing.
-                            width: "100%",            // Full width for consistency.
-                            fontFamily: "inherit",    // Inherits the font from parent (you can customize this).
-                          }}
-                      />
+                  <div
+                    style={{
+                      overflowY: "auto",
+                      height: "calc(100vh - 200px)",
+                      padding: 10,
+                      border: "none",
+                    }}
+                  >
+                    <pre
+                      id="textArea"
+                      contentEditable={true}
+                      dangerouslySetInnerHTML={{
+                        __html: replaceHeaders(response.trim()), // Trim white spaces from the response.
+                      }}
+                      onBlur={(e) => setResponse(e.target.innerHTML)}
+                      style={{
+                        whiteSpace: "pre-wrap",   // Wraps text, respects newlines but removes excess space.
+                        wordWrap: "break-word",   // Prevents overflow of long words.
+                        margin: 0,                // No additional margins.
+                        padding: 0,               // No additional padding.
+                        outline: "none",          // No outline while editing.
+                        width: "100%",            // Full width for consistency.
+                        fontFamily: "inherit",    // Inherits the font from parent (you can customize this).
+                      }}
+                    />
+                  </div>
 
-                    </div>
                 )}
+
 
                 {/* {reports.length > 0 && !response && (
                   <div
@@ -635,11 +746,11 @@ const Chat = () => {
                   </div>
                 )} */}
                 {!isLoading && !error && !response && reports.length > 0 && (
-                    <div
-                        style={{
-                          overflowY: "auto",
-                          height: "calc(100vh - 200px)",
-                          padding: 10,
+                  <div
+                    style={{
+                      overflowY: "auto",
+                      height: "calc(100vh - 200px)",
+                      padding: 10,
                     }}
                   >
                     {reports?.map((item, key) => (
@@ -680,7 +791,7 @@ const Chat = () => {
               margin: "auto", // Add this line to center the div
             }}
           >
-          <div
+            <div
               style={{
                 marginBottom: "20px",
                 display: "flex",
@@ -689,18 +800,19 @@ const Chat = () => {
               }}
             >
               <Button
-               variant="outlined"
-               style={{
-                marginBottom: "10px",
-                borderRadius: "50%", 
-                width: "50px", 
-                height: "50px", 
-                minWidth: "50px", 
-                padding: "0",
-                backgroundColor: "#CDE0EA", 
-                color: "#023246", 
-              }}
-              onClick={()=>{ handlebuttonSubmit("SOAP")}}
+                variant="outlined"
+                style={{
+                  marginBottom: "10px",
+                  borderRadius: "50%",
+                  width: "50px",
+                  height: "50px",
+                  minWidth: "50px",
+                  padding: "0",
+                  backgroundColor: "#CDE0EA",
+                  color: "#023246",
+                }}
+                onClick={() =>
+                  handlebuttonSubmit("SOAP")}
               >
                 SOAP
               </Button>
@@ -717,24 +829,25 @@ const Chat = () => {
                   color: "#023246",
                 }}
                 onClick={() => {
-                  handlebuttonSubmit("COMP")}}
+                  handlebuttonSubmit("COMP")
+                }}
               >
                 COMP
               </Button>
               <Button
-               variant="outlined"
-               style={{
-                marginBottom: "10px",
-                borderRadius: "50%", 
-                width: "50px", 
-                height: "50px", 
-                minWidth: "50px", 
-                padding: "0",
-                backgroundColor: "#CDE0EA",
-                color: "#023246",      
+                variant="outlined"
+                style={{
+                  marginBottom: "10px",
+                  borderRadius: "50%",
+                  width: "50px",
+                  height: "50px",
+                  minWidth: "50px",
+                  padding: "0",
+                  backgroundColor: "#CDE0EA",
+                  color: "#023246",
 
-              }}
-              onClick={()=>{ handlebuttonSubmit("SUPR")}}
+                }}
+                onClick={() => { handlebuttonSubmit("SUPR") }}
               >
                 SUPR
               </Button>
@@ -773,6 +886,94 @@ const Chat = () => {
                 />
               </Button>
             </Box>
+          </Box>
+
+
+        </Box>
+
+
+
+        <Box sx={{
+          display: 'flex',
+          flexDirection: 'row',
+          justifyContent: 'center',
+          alignItems: 'center',
+          gap: 4,
+          margin: 2
+        }}>
+          <Box
+            sx={{
+              width: 40,
+              height: 40,
+              borderRadius: "50%",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              backgroundColor: "lightblue",
+            }}
+            onClick={button && button === 'create' ? () => handleSubmit() : button === 'edit' ? () => editButtonClick(editButtoniD) : undefined}
+            disabled={!button}
+          >
+            <Save />
+          </Box>
+
+          <Box
+            sx={{
+              width: 40,
+              height: 40,
+              borderRadius: "50%",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              backgroundColor: "lightblue",
+            }}
+            onClick={updateChatInputs}
+          >
+            <Remove />
+          </Box>
+
+          <Box
+            sx={{
+              width: 40,
+              height: 40,
+              borderRadius: "50%",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              backgroundColor: "lightblue",
+            }}
+            onClick={handleChatPrint}
+          >
+            <Print />
+          </Box>
+
+          <Box
+            sx={{
+              width: 40,
+              height: 40,
+              borderRadius: "50%",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              backgroundColor: "lightblue",
+            }}
+            onClick={() => handleCopyToClipboard(response)}
+          >
+            <Copy />
+          </Box>
+          <Box
+            sx={{
+              width: 40,
+              height: 40,
+              borderRadius: "50%",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              backgroundColor: "lightblue",
+            }}
+            onClick={() => alert('Emr Button Clicked !!!')}
+          >
+            <Emr />
           </Box>
         </Box>
 
@@ -838,18 +1039,18 @@ const Chat = () => {
                 onBrainEngage={handleBrainEngage}
                 onBrainDisengage={handleBrainDisengage}
               /> */}
-              <BrainButton
-                isLoading={isLoading}
-                isBrainEngaged={isBrainEngaged}
-                isMicrophoneOn={isMicrophoneOn}
-                handleMic={handleBrainMic}
-                handleClick={handleBrainButtonClick}
-                startRecording={startMicrophone}
-                stopMicrophone={stopMicrophone}
-              />
+                  <BrainButton
+                    isLoading={isLoading}
+                    isBrainEngaged={isBrainEngaged}
+                    isMicrophoneOn={isMicrophoneOn}
+                    handleMic={handleBrainMic}
+                    handleClick={handleBrainButtonClick}
+                    startRecording={startMicrophone}
+                    stopMicrophone={stopMicrophone}
+                  />
+                </div>
+              </div>
             </div>
-          </div>
-        </div>
             :
             <div></div>
         }

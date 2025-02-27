@@ -7,6 +7,7 @@ import { MdOutlineLightMode } from "react-icons/md";
 import { TopicProvider, useTopic } from "../../context/TopicContext";
 import { ChatContextProvider, useChatContext } from "../../context/ChatContext";
 import { SidebarProvider } from "../../context/SidebarContext";
+import { SaveButtonProvider } from "../../context/SaveButtonContext";
 const Home = () => {
   const { darkMode, toggleDarkMode } = useTheme();
 
@@ -14,6 +15,7 @@ const Home = () => {
     <SidebarProvider>
       <TopicProvider>
         <ChatContextProvider>
+          <SaveButtonProvider >
           <div
             style={{
               width: "98%",
@@ -25,6 +27,7 @@ const Home = () => {
           >
             <Topbar />
           </div>
+          </SaveButtonProvider>
         </ChatContextProvider>
       </TopicProvider>
     </SidebarProvider>

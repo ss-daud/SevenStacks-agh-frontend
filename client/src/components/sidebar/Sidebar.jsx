@@ -1,4 +1,4 @@
-import { Typography, Box, Button } from "@mui/material";
+import { Typography, Box, Button, containerClasses } from "@mui/material";
 import React, { useCallback, useEffect, useState } from "react";
 import LogoutIcon from "@mui/icons-material/Logout";
 import Close from "../../assets/svgs/Close";
@@ -14,6 +14,8 @@ import { useChatContext } from "../../context/ChatContext";
 import DeleteAll from "../DeleteAll";
 import { useSidebar } from "../../context/SidebarContext";
 import img1 from "../../assets/imgs/toggle.png";
+import SidebarChat from "../SidebarChat/SidebarChat";
+import { TextField } from '@mui/material';
 
 const Sidebar = () => {
   const {
@@ -29,6 +31,9 @@ const Sidebar = () => {
 
   const [isModalOpen, setIsModalOpen] = useState(false);
   const { topics } = useTopic();
+  const [checked, setChecked] = useState(false)
+  const [ids, setiDs] = useState([])
+  const [searchText, setSearchText] = useState('');
 
   const handleChange = () => {
     setIsModalOpen(true);
@@ -45,17 +50,51 @@ const Sidebar = () => {
     localStorage.clear();
     navigate("/");
   };
+  const [checkedItems, setCheckedItems] = useState({});
+
+  const handleCheckChange = (id, e) => {
+    const isChecked = e.checked;
+    setCheckedItems((prev) => {
+      const updatedItems = { ...prev };
+      if (isChecked) {
+        updatedItems[id] = true;
+      } else {
+        delete updatedItems[id];
+      }
+      return updatedItems;
+    });
+
+    setiDs((prev) => {
+      if (e.checked) {
+        return [...prev, id];
+      } else {
+        return prev.filter((idz) => idz !== id);
+      }
+    });
+  };
+
+  const handleTextChange = (e) => {
+    setSearchText(e.target.value)
+  }
+
+  const filteredData = topics.filter((item) =>
+    [item?.record.DOB, item?.record.MRN, item.record.Patient_Name].some((field) =>
+      field?.toLowerCase().includes(searchText?.toLowerCase())
+    )
+  );
+
+
 
   return (
     <div
       style={{
-        width: isSidebarOpen ? 300 : 50, // Adjust width based on the sidebar state
+        width: isSidebarOpen ? 300 : 50,
         height: "100%",
         display: "flex",
         flex: "1",
         flexDirection: "column",
         justifyContent: "space-between",
-        transition: "width 0.5s ease", // Add transition for smooth animation
+        transition: "width 0.5s ease",
       }}
     >
       <div>
@@ -64,13 +103,26 @@ const Sidebar = () => {
             sx={{
               display: "flex",
               justifyContent: "flex-start",
+              alignItems: 'center',
+              marginLeft: 2,
             }}
           >
+            <TextField
+              label="Search"
+              variant="outlined"
+              fullWidth
+              size="small"
+              value={searchText}
+              onChange={handleTextChange}
+              sx={{
+                maxWidth: 300,
+              }}
+            />
             <Box
               onClick={updateChatInputs}
               style={{
                 backgroundColor: "#023246",
-                width: isSidebarOpen ? 180 : 0,
+                width: isSidebarOpen ? 60 : 0,
                 height: 49,
                 borderRadius: 10,
                 marginLeft: 24,
@@ -86,28 +138,8 @@ const Sidebar = () => {
                 color="white"
                 style={{ marginRight: 2, fontSize: "20px" }}
               />
-              <Typography
-                style={{ font: "Roboto", fontWeight: 400, fontSize: "14px" }}
-              >
-                New chat
-              </Typography>
             </Box>
 
-            <Button
-              variant="contained"
-              onClick={toggleSidebar}
-              style={{
-                backgroundColor: "#F6F6F6",
-                color: "#023246",
-                borderRadius: 12,
-                marginLeft: 4,
-
-                border: "1px solid #559BB9 ",
-                transition: "width 0.5s ease", // Add transition for smooth closing
-              }}
-            >
-              <Close />
-            </Button>
           </Box>
         ) : (
           <Box onClick={toggleSidebar} style={{}}>
@@ -165,14 +197,20 @@ const Sidebar = () => {
                 Current
               </Typography>
             </Box>
-            {topics.map((data, i) => {
+            {filteredData.map((data, i) => {
               return (
-                <ConservationCard
+                <SidebarChat
                   key={i}
                   id={data?._id}
-                  text={data?.heading}
+                  text={data?.record?.Patient_Name}
                   color={data?.title?.color}
-                  res={data?.response}
+                  res={data?.patients}
+                  patient={data?.patients}
+                  handleCheckChange={handleCheckChange}
+                  checked={checkedItems} // Use checked state from object
+                  setChecked={setChecked}
+                  ids={ids}
+                  setiDs={setiDs}
                 />
               );
             })}
@@ -239,7 +277,7 @@ const Sidebar = () => {
         </div>
       )}
 
-      <DeleteAll open={isModalOpen} onClose={() => setIsModalOpen(false)} />
+      <DeleteAll open={isModalOpen} onClose={() => setIsModalOpen(false)} ids={ids} setiDs={setiDs} setCheckedItems={setCheckedItems} />
     </div>
   );
 };

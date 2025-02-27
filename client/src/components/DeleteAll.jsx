@@ -25,7 +25,7 @@ const style = {
   pad: 4,
 };
 
-export default function DeleteAll({ open, onClose, id }) {
+export default function DeleteAll({ open, onClose, id, ids, setiDs, setCheckedItems }) {
   const { topics, removeTopic, fetchTopics } = useTopic();
   const {
     input,
@@ -45,16 +45,19 @@ export default function DeleteAll({ open, onClose, id }) {
     try {
       const config = {
         headers: {
-          Authorization: `Bearer ${token}`, // Include the token in the 'Authorization' header
+          Authorization: `Bearer ${token}`,
         },
+        data: ids
       };
 
       const response = await axios.delete(
-        `${AUTH_URL}api/topic/topics`,
+        `${AUTH_URL}api/topic/topics/delete`,
         config
       );
 
       if (response.status === 200) {
+        setiDs([]);
+        setCheckedItems();
         fetchTopics();
         onClose();
         setInput("");
