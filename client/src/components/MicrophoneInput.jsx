@@ -8,10 +8,13 @@ const MicrophoneInput = ({
   data,
   getVoiceInput,
   isLoading,
+  isMicrophoneOn,
   onStatusChange,
   isBrainEngaged,
   previousInput,
   addPreviouseInput,
+  setResponse,
+  setInput
 }) => {
   const [attached, setAttached] = useState(false);
   const [selectedLanguage, setSelectedLanguage] = useState("en-US")
@@ -63,6 +66,7 @@ const MicrophoneInput = ({
     onStatusChange(false);
     recognition.removeEventListener("result", handleInput);
     // addPreviouseInput();
+    setInput('');
     console.log("Microphone is stopped");
   };
 
@@ -85,7 +89,7 @@ const MicrophoneInput = ({
   return (
     <>
       <div>
-        <FormControl style={{ marginBottom: 16, marginLeft: 10, background: selectedLanguage ? '#E0F7FA' : 'transparent' }}>
+        <FormControl style={{ marginBottom: 16, marginLeft: 10, background: selectedLanguage ? '#E0F7FA' : 'transparent', border: '1px solid blue', borderRadius: '5px' }}>
           <Select
             labelId="language-select-label"
             id="language-select"
@@ -105,20 +109,39 @@ const MicrophoneInput = ({
       <div>
         <Box style={{ marginBottom: 10, }}>
           {isMicrophoneActive ? (
-            <Box onClick={stopMicrophone}>
-              <Mike />
-            </Box>
+            <>
+              <Button
+                variant="outlined"
+                style={{
+                  marginBottom: "10px",
+                  borderRadius: "50%",
+                  width: "50px",
+                  height: "50px",
+                  minWidth: "50px",
+                  padding: "0",
+                  backgroundColor: "#CDE0EA ",
+                  color: "#023246",
+                }}
+                onClick={stopMicrophone}          >
+                <Mike />
+              </Button>
+            </>
           ) : (
             <Box>
               <Button
+                style={{
+                  width: "50px",
+                  height: "50px",
+                  minWidth: "50px",
+                }}
                 onClick={startMicrophone}
                 disabled={isLoading || isBrainEngaged}
               >
                 <img
                   src={img1}
                   alt="microphone"
-                  height={isLargeScreen ? 80 : 45}
-                  width={isLargeScreen ? 80 : 45}
+                  height={isLargeScreen ? 80 : 60}
+                  width={isLargeScreen ? 80 : 60}
                 />
               </Button>
             </Box>

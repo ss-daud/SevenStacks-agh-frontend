@@ -184,19 +184,6 @@ const Sidebar = () => {
             `}
               `{" "}
             </style>
-            <Box style={{ marginLeft: 24 }}>
-              <Typography
-                style={{
-                  fontFamily: "'DM Sans', sans-serif",
-                  fontWeight: 400,
-                  fontSize: "16px",
-                  lineHeight: "17px",
-                  color: "#023246",
-                }}
-              >
-                Current
-              </Typography>
-            </Box>
             {filteredData.map((data, i) => {
               return (
                 <SidebarChat
@@ -252,7 +239,7 @@ const Sidebar = () => {
                 cursor: "pointer",
               }}
             >
-              Clear conversations
+              Clear Chat
             </Typography>
           </Box>
           <Box style={{ paddingLeft: "16px" }} onClick={handleLogout}>

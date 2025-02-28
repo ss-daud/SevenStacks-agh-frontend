@@ -91,7 +91,7 @@ export default function DeleteAll({ open, onClose, id, ids, setiDs, setCheckedIt
               color: "#023246",
             }}
           >
-            Clear Conversation
+            Clear Chat
           </Typography>
           <Typography
             sx={{

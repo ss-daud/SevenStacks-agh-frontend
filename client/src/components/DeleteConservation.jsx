@@ -61,7 +61,7 @@ export default function DeleteConservation({ open, onClose, id }) {
               color: "#023246",
             }}
           >
-            Clear Conversation
+            Clear Chat
           </Typography>
           <Typography
             sx={{
