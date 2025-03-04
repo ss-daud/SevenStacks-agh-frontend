@@ -5,6 +5,7 @@ import {
   Typography,
   Box,
   useMediaQuery,
+  Tooltip,
 } from "@mui/material";
 import { AUTH_URL } from "../../api";
 import useOpenAI from "../../openai/OpenAi";
