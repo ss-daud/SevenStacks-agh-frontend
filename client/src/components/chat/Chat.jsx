@@ -901,80 +901,101 @@ const Chat = () => {
           gap: 4,
           margin: 2
         }}>
-          <Box
-            sx={{
-              width: 40,
-              height: 40,
-              borderRadius: "50%",
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-              backgroundColor: "lightblue",
-            }}
-            onClick={button && button === 'create' ? () => handleSubmit() : button === 'edit' ? () => editButtonClick(editButtoniD) : undefined}
-            disabled={!button}
-          >
-            <Save />
-          </Box>
+          <Tooltip title='Save' arrow placement="top">
+            <Button
+              variant="outlined"
+              style={{
+                marginBottom: "10px",
+                borderRadius: "50%",
+                width: "50px",
+                height: "50px",
+                minWidth: "50px",
+                padding: "0",
+                backgroundColor: "#CDE0EA ",
+                color: "#023246",
+              }}
+              onClick={button && button === 'create' ? () => handleSubmit() : button === 'edit' ? () => editButtonClick(editButtoniD) : undefined}
+            >
+              <Save />
+            </Button>
+          </Tooltip>
 
-          <Box
-            sx={{
-              width: 40,
-              height: 40,
-              borderRadius: "50%",
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-              backgroundColor: "lightblue",
-            }}
-            onClick={updateChatInputs}
-          >
-            <Remove />
-          </Box>
+          <Tooltip title='Remove' arrow placement="top">
+            <Button
+              variant="outlined"
+              style={{
+                marginBottom: "10px",
+                borderRadius: "50%",
+                width: "50px",
+                height: "50px",
+                minWidth: "50px",
+                padding: "0",
+                backgroundColor: "#CDE0EA ",
+                color: "#023246",
+              }}
+              onClick={updateChatInputs}
+            >
+              <Remove />
+            </Button>
+          </Tooltip>
 
-          <Box
-            sx={{
-              width: 40,
-              height: 40,
-              borderRadius: "50%",
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-              backgroundColor: "lightblue",
-            }}
-            onClick={handleChatPrint}
-          >
-            <Print />
-          </Box>
+          <Tooltip title='Print' arrow placement="top">
+            <Button
+              variant="outlined"
+              style={{
+                marginBottom: "10px",
+                borderRadius: "50%",
+                width: "50px",
+                height: "50px",
+                minWidth: "50px",
+                padding: "0",
+                backgroundColor: "#CDE0EA ",
+                color: "#023246",
+              }}
+              onClick={handleChatPrint}
+            >
+              <Print />
+            </Button>
+          </Tooltip>
 
-          <Box
-            sx={{
-              width: 40,
-              height: 40,
-              borderRadius: "50%",
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-              backgroundColor: "lightblue",
-            }}
-            onClick={() => handleCopyToClipboard(response)}
-          >
-            <Copy />
-          </Box>
-          <Box
-            sx={{
-              width: 40,
-              height: 40,
-              borderRadius: "50%",
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-              backgroundColor: "lightblue",
-            }}
-            onClick={() => alert('Emr Button Clicked !!!')}
-          >
-            <Emr />
-          </Box>
+          <Tooltip title='Copy' arrow placement="top">
+            <Button
+              variant="outlined"
+              style={{
+                marginBottom: "10px",
+                borderRadius: "50%",
+                width: "50px",
+                height: "50px",
+                minWidth: "50px",
+                padding: "0",
+                backgroundColor: "#CDE0EA ",
+                color: "#023246",
+              }}
+              onClick={() => handleCopyToClipboard(response)}
+            >
+              <Copy />
+            </Button>
+          </Tooltip>
+
+          <Tooltip title='EMR' arrow placement="top">
+            <Button
+              variant="outlined"
+              style={{
+                marginBottom: "10px",
+                borderRadius: "50%",
+                width: "50px",
+                height: "50px",
+                minWidth: "50px",
+                padding: "0",
+                backgroundColor: "#CDE0EA ",
+                color: "#023246",
+              }}
+              onClick={() => alert('Emr Button Clicked !!!')}
+            >
+              <Emr />
+            </Button>
+          </Tooltip>
+
         </Box>
 
         {

@@ -46,7 +46,7 @@ const CustomTextField = styled(TextField)({
 const validationSchema = yup.object({
   emailOrUsername: yup
     .string("Enter your email or username")
-    .required("Email or username is required"),
+    .required("Email is required"),
   password: yup
     .string("Enter your password")
     .min(8, "Password should be of minimum 8 characters length")
@@ -147,7 +147,7 @@ export default function Login() {
                 marginLeft: 6,
               }}
             >
-              Email or Username
+              Email
             </Typography>
           </Box>
           <Box
@@ -159,8 +159,9 @@ export default function Login() {
           >
             <CustomTextField
               id="emailOrUsername"
-              placeholder="Enter your email or username"
+              placeholder="Enter your email address"
               variant="outlined"
+              type="email"
               value={formik.values.emailOrUsername}
               onChange={formik.handleChange}
               error={formik.touched.email && Boolean(formik.errors.email)}

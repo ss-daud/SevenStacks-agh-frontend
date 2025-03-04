@@ -242,25 +242,6 @@ const Sidebar = () => {
               Clear Chat
             </Typography>
           </Box>
-          <Box style={{ paddingLeft: "16px" }} onClick={handleLogout}>
-            <Typography
-              sx={{
-                fontFamily: "'DM Sans', sans-serif",
-                fontWeight: 400,
-                fontSize: "14px",
-                lineHeight: "17px",
-                color: "#023246",
-                display: "flex",
-                alignItems: "center",
-                cursor: "pointer",
-              }}
-            >
-              <LogoutIcon
-                style={{ fontSize: 16, marginRight: 14, cursor: "pointer" }}
-              />
-              Log out
-            </Typography>
-          </Box>
         </div>
       )}
 
