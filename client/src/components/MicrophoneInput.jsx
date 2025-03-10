@@ -103,6 +103,8 @@ const MicrophoneInput = ({
           >
             <MenuItem value="ar-SA">AR</MenuItem>
             <MenuItem value="en-US">EN</MenuItem>
+            <MenuItem value="es-ES">ES</MenuItem>
+            <MenuItem value="tr-TR">TR</MenuItem>
           </Select>
         </FormControl>
       </div>
