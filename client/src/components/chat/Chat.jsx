@@ -129,8 +129,15 @@ const Chat = () => {
   const handleSubmit = async () => {
 
     const DataRes = await fetchRecord(response);
-
-    console.log("<---R E C O R D S--->", DataRes)
+    if (typeof DataRes !== "object" || DataRes === null) {
+      alert("Invalid data received");
+      return;
+    }
+    
+    if (!DataRes.Patient_Name) {
+      alert("Enter Patient name");
+      return;
+    }
 
     const apiObject = {
       response: response || input.replace(/(?:\r\n|\r|\n)/g, "<br>"),
