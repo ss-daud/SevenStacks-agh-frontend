@@ -60,7 +60,7 @@ const useOpenAI = () => {
 - Do **not** include extra text, explanations, or markdown.  
 - Date format should be **YYYY-MM-DD**.  
 - JSON keys should be: **"Patient_Name"**, **"DOB"**, and **"MRN"**.  
-- **Do not return null values or placeholders untill you dont find any value.Make sure If you didnot find any value return null for that value**  
+- **Do not return null values or placeholders untill you dont find any value.Make sure If you didnot find any value for "DOB" and "MRN" return null for that value.If you didnot find "Patient_Name" return a string "Patient Name"**  
 
 **Example Input:**  
 "
@@ -79,7 +79,7 @@ const useOpenAI = () => {
         ],
         temperature: 0,
       });
-      const recordContent = recordresponse.choices[0]?.message?.content;
+      var recordContent = recordresponse.choices[0]?.message?.content;
 
       if (!recordContent.startsWith("{")) {
         recordContent = recordContent.replace(/```json|```/g, "").trim();
