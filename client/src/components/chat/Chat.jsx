@@ -133,7 +133,7 @@ const Chat = () => {
       alert("Invalid data received");
       return;
     }
-    
+
     if (!DataRes.Patient_Name) {
       alert("Enter Patient name");
       return;
@@ -141,7 +141,7 @@ const Chat = () => {
 
     const apiObject = {
       response: response || input.replace(/(?:\r\n|\r|\n)/g, "<br>"),
-      record:   DataRes,
+      record: DataRes,
     };
 
     const token = localStorage.getItem("token");
@@ -499,7 +499,7 @@ const Chat = () => {
   }
 
   const [startRecording, setStartRecording] = useState(false);
-  const [buttonData, setButtonData] = useState({});
+  const [buttonData, setButtonData] = useState([]);
 
   const [recognition, setRecognition] = useState(null);
   const startMicrophone = async () => {
@@ -807,58 +807,31 @@ const Chat = () => {
                 alignItems: "center",
               }}
             >
-              <Button
-                variant="outlined"
-                style={{
-                  marginBottom: "10px",
-                  borderRadius: "50%",
-                  width: "50px",
-                  height: "50px",
-                  minWidth: "50px",
-                  padding: "0",
-                  backgroundColor: "#CDE0EA",
-                  color: "#023246",
-                }}
-                onClick={() =>
-                  handlebuttonSubmit("SOAP")}
-              >
-                SOAP
-              </Button>
-              <Button
-                variant="outlined"
-                style={{
-                  marginBottom: "10px",
-                  borderRadius: "50%",
-                  width: "50px",
-                  height: "50px",
-                  minWidth: "50px",
-                  padding: "0",
-                  backgroundColor: "#CDE0EA ",
-                  color: "#023246",
-                }}
-                onClick={() => {
-                  handlebuttonSubmit("COMP")
-                }}
-              >
-                COMP
-              </Button>
-              <Button
-                variant="outlined"
-                style={{
-                  marginBottom: "10px",
-                  borderRadius: "50%",
-                  width: "50px",
-                  height: "50px",
-                  minWidth: "50px",
-                  padding: "0",
-                  backgroundColor: "#CDE0EA",
-                  color: "#023246",
 
-                }}
-                onClick={() => { handlebuttonSubmit("SUPR") }}
-              >
-                SUPR
-              </Button>
+              {
+                buttonData?.map((buttons, i) => {
+                  return (
+                    <Button
+                      variant="outlined"
+                      style={{
+                        marginBottom: "10px",
+                        borderRadius: "50%",
+                        width: "50px",
+                        height: "50px",
+                        minWidth: "50px",
+                        padding: "0",
+                        backgroundColor: "#CDE0EA",
+                        color: "#023246",
+                      }}
+                      key={i}
+                      onClick={() =>
+                        handlebuttonSubmit(buttons.name)}
+                    >
+                      {buttons.name}
+                    </Button>
+                  )
+                })
+              }
             </div>
             <MicrophoneInput
               data={data}
