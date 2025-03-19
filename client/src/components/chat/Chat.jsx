@@ -24,6 +24,9 @@ import Copy from "../../assets/svgs/Copy";
 import Remove from "../../assets/svgs/Remove";
 import { useButton } from "../../context/SaveButtonContext";
 import Emr from "../../assets/svgs/Emr";
+import AddpatientModal from "../AddpatientModal";
+import CircularProgress from '@mui/material/CircularProgress';
+
 
 const Chat = () => {
   const {
@@ -41,7 +44,7 @@ const Chat = () => {
   const { addTopic, topics, fetchTopics } = useTopic();
   const isScreen = useMediaQuery("(max-width: 1100px)");
   const isLargeScreen = useMediaQuery("(min-width:2000px)");
-  const { data, record, isLoading, error, fetchData, fetchRecord, setRecord } = useOpenAI();
+  const { data, record, isLoading, error, fetchData, fetchRecord, setRecord, setPatientname, setPatient, patientname } = useOpenAI();
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [title, setTitle] = useState([]);
   const [isMicrophoneOn, setIsMicrophoneOn] = useState(false);
@@ -50,7 +53,8 @@ const Chat = () => {
   const [adminStatus, setAdminStatus] = useState();
   const responseRef = useRef(null);
   const { button, editButton, newButton, editButtoniD } = useButton();
-
+  const [addpatientModal, setaddpatientmodal] = useState(false);
+  const [patientresponse, setPatientResponse] = useState("")
   const [previous, setPrevious] = useState("");
 
   const [isMediumScreen, setIsMediumScreen] = useState(
@@ -71,6 +75,7 @@ const Chat = () => {
     setResponse("");
     setReports("");
     setPreviousInput("");
+    setPatientname("");
   };
 
   useEffect(() => {
@@ -85,7 +90,6 @@ const Chat = () => {
   };
 
   const handleInputChange = (event) => {
-    console.log(event.target.value);
     setInput(event.target.value);
   };
 
@@ -126,16 +130,20 @@ const Chat = () => {
     setBrainInput(value);
   };
 
-  const handleSubmit = async () => {
+  useEffect(() => {
+    setPatientResponse(data)
+  }, [data])
 
+  const handleSubmit = async () => {
     const DataRes = await fetchRecord(response);
+
     if (typeof DataRes !== "object" || DataRes === null) {
       alert("Invalid data received");
       return;
     }
 
     if (!DataRes.Patient_Name) {
-      alert("Enter Patient name");
+      setaddpatientmodal(true);
       return;
     }
 
@@ -165,6 +173,51 @@ const Chat = () => {
 
       updateChatInputs();
       setRecord('');
+    } catch (error) {
+      console.error("Error saving profile:", error);
+    }
+  };
+
+  const handlepatientsubmit = async () => {
+    const patienWithName = await setPatient(response);
+
+    if (typeof patienWithName.record !== "object" || patienWithName.record === null) {
+      alert("Invalid data received");
+      return;
+    }
+
+    if (!patienWithName.record.Patient_Name) {
+      setaddpatientmodal(true);
+      return;
+    }
+
+    const apiObject = {
+      response: patienWithName.content || input.replace(/(?:\r\n|\r|\n)/g, "<br>"),
+      record: patienWithName.record,
+    };
+
+    const token = localStorage.getItem("token");
+
+    try {
+      const response = await axios.post(
+        `${AUTH_URL}api/topic/create`,
+        apiObject,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "application/json",
+          },
+        }
+      );
+
+      if (response?.data?.newTopic) {
+        addTopic(response?.data?.newTopic);
+        await fetchTopics();
+      }
+
+      updateChatInputs();
+      setRecord('');
+      setPatientname('');
     } catch (error) {
       console.error("Error saving profile:", error);
     }
@@ -419,7 +472,6 @@ const Chat = () => {
 
         // query = gpt_query(brainInput, input, history, format);
       } else {
-        console.log("give");
         const _value = response || input;
 
         if (input) {
@@ -446,7 +498,6 @@ const Chat = () => {
       }
     }
 
-    console.log(query);
     fetchData(query);
   };
 
@@ -658,7 +709,8 @@ const Chat = () => {
               display: "flex",
               flexDirection: "column",
               boxShadow: "10px 10px 15px rgba(0, 0, 0, 0.2)",
-              backgroundColor: "#FAFEFF", // Add this line for box shadow
+              backgroundColor: "#FAFEFF",
+              overflow: "auto"
             }}
           >
             <Box
@@ -676,14 +728,17 @@ const Chat = () => {
                   width: "100%",
                   height: "100%",
                   border: "none",
+                  display: isLoading ? "flex" : "",
+                  justifyContent: isLoading ? "center" : "",
+                  alignItems: isLoading ? "center": "",
                 }}
               >
-                {isLoading && <p>Loading...</p>}
+                {isLoading && <CircularProgress />}
                 {error && response && <p>Error: {error.message}</p>}
                 {!response && !isLoading && reports.length == 0 && (
                   <div
                     style={{
-                      height: "calc(100vh - 200px)",
+                      height: "calc(100vh -300px)",
                       display: "flex",
                       overflowY: "auto",
                       padding: 4,
@@ -709,7 +764,7 @@ const Chat = () => {
                   <div
                     style={{
                       overflowY: "auto",
-                      height: "calc(100vh - 200px)",
+                      height: "calc(100vh - 300px)",
                       padding: 10,
                       border: "none",
                     }}
@@ -797,6 +852,8 @@ const Chat = () => {
               justifyContent: "center",
               alignItems: "center",
               margin: "auto", // Add this line to center the div
+              marginRight: "10px",
+              marginLeft: "10px",
             }}
           >
             <div
@@ -819,9 +876,9 @@ const Chat = () => {
                         width: "50px",
                         height: "50px",
                         minWidth: "50px",
-                        padding: "0",
                         backgroundColor: "#CDE0EA",
                         color: "#023246",
+                        fontSize : "11px",
                       }}
                       key={i}
                       onClick={() =>
@@ -1056,6 +1113,7 @@ const Chat = () => {
             :
             <div></div>
         }
+        <AddpatientModal open={addpatientModal} onClose={() => setaddpatientmodal(false)} setPatientname={setPatientname} fetchRecord={fetchRecord} response={response} handleSubmit={handleSubmit} handlepatientsubmit={handlepatientsubmit} patientname={patientname}/>
       </div>
     </>
   );

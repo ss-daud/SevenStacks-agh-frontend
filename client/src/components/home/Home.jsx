@@ -1,7 +1,7 @@
 import React, { useEffect } from "react";
 import Topbar from "../topbar/Topbar";
 import { useTheme } from "../../context/ThemeContext";
-import { IconButton } from "@mui/material";
+import { Hidden, IconButton } from "@mui/material";
 import DarkModeIcon from "@mui/icons-material/DarkMode";
 import { MdOutlineLightMode } from "react-icons/md";
 import { TopicProvider, useTopic } from "../../context/TopicContext";
@@ -18,8 +18,8 @@ const Home = () => {
           <SaveButtonProvider >
           <div
             style={{
-              width: "98%",
               height: "100vh",
+              overflowX: "hidden",
 
               // backgroundColor: darkMode ? "#1a1a1a" : "#ffffff",
               color: darkMode ? "#ffffff" : "#000000",
