@@ -26,6 +26,7 @@ import { useButton } from "../../context/SaveButtonContext";
 import Emr from "../../assets/svgs/Emr";
 import AddpatientModal from "../AddpatientModal";
 import CircularProgress from '@mui/material/CircularProgress';
+import moment from 'moment-timezone';
 
 
 const Chat = () => {
@@ -54,8 +55,7 @@ const Chat = () => {
   const responseRef = useRef(null);
   const { button, editButton, newButton, editButtoniD } = useButton();
   const [addpatientModal, setaddpatientmodal] = useState(false);
-  const [patientresponse, setPatientResponse] = useState("")
-  const [previous, setPrevious] = useState("");
+  const [timeZone, setTimeZone] = useState("");
 
   const [isMediumScreen, setIsMediumScreen] = useState(
     window.innerWidth > 50 && window.innerWidth <= 900
@@ -77,6 +77,12 @@ const Chat = () => {
     setPreviousInput("");
     setPatientname("");
   };
+
+  useEffect(() => {
+    const timeZone = Intl.DateTimeFormat().resolvedOptions().timeZone;
+    const formatTime = moment().tz(timeZone).format("D-MM-YYYY hh:mm a");
+    setTimeZone(formatTime);
+  }, [])
 
   useEffect(() => {
     window.addEventListener("resize", handleResize);
@@ -130,10 +136,6 @@ const Chat = () => {
     setBrainInput(value);
   };
 
-  useEffect(() => {
-    setPatientResponse(data)
-  }, [data])
-
   const handleSubmit = async () => {
     const DataRes = await fetchRecord(response);
 
@@ -150,6 +152,7 @@ const Chat = () => {
     const apiObject = {
       response: response || input.replace(/(?:\r\n|\r|\n)/g, "<br>"),
       record: DataRes,
+      timeZone: timeZone
     };
 
     const token = localStorage.getItem("token");
@@ -194,6 +197,7 @@ const Chat = () => {
     const apiObject = {
       response: patienWithName.content || input.replace(/(?:\r\n|\r|\n)/g, "<br>"),
       record: patienWithName.record,
+      timeZone: timeZone
     };
 
     const token = localStorage.getItem("token");
@@ -308,7 +312,8 @@ const Chat = () => {
       // Update the record
       const apiObject = {
         id: id,
-        response: currentContent
+        response: currentContent,
+        timeZone: timeZone
       };
 
       const response = await axios.put(`${AUTH_URL}api/topic/UpdateTopic/${id}`,

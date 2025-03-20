@@ -36,6 +36,10 @@ const Sidebar = () => {
   const [searchText, setSearchText] = useState('');
 
   const handleChange = () => {
+    if (ids.length === 0) {
+      alert("Please select a conversation to delete");
+      return;
+    }
     setIsModalOpen(true);
   };
   const updateChatInputs = () => {
@@ -184,7 +188,7 @@ const Sidebar = () => {
             `}
               `{" "}
             </style>
-            {filteredData.map((data, i) => {
+            {filteredData.reverse().map((data, i) => {
               return (
                 <SidebarChat
                   key={i}
