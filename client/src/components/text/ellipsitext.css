@@ -5,4 +5,13 @@
   align-items: center;
   justify-content: center;
   text-align: center;
+  font-size: large;
+}
+.ellipsis-dob{
+  font-size: small;
+}
+.ellipisis-container{
+  display: flex;
+  flex-direction: column;
+  align-items: center;
 }

@@ -11,7 +11,7 @@ import useOpenAI from "../../openai/OpenAi";
 import { useButton } from "../../context/SaveButtonContext";
 import Folder from "../../assets/svgs/Folder";
 
-export default function ({ text, color, res, id, patient, handleCheckChange, checked, setChecked, ids, setiDs }) {
+export default function ({ text, color, res, id, patient, handleCheckChange, checked, setChecked, ids, setiDs, dob }) {
     const { setResponse } = useChatContext();
     const [isOpen, setisOpen] = useState(false);
     const { button, editButton, newButton, editButtoniD, editiD } = useButton();
@@ -62,7 +62,7 @@ export default function ({ text, color, res, id, patient, handleCheckChange, che
 
                     <Box
                     >
-                        <EllipsisText text={text} />
+                        <EllipsisText text={text} dob={dob} />
                     </Box>
 
                     <KeyboardArrowDownIcon

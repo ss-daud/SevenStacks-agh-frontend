@@ -47,7 +47,7 @@ console.log("username", username);
           `https://ai-emr.s3.amazonaws.com/profile-images/${response?.data?.user?.userImage}`
         );
       }
-      else if (response?.data.user?.username){
+      if (response?.data.user?.username){
         setusername(response?.data.user?.username);
       }
     } catch (error) {

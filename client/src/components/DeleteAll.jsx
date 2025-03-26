@@ -91,7 +91,7 @@ export default function DeleteAll({ open, onClose, id, ids, setiDs, setCheckedIt
               color: "#023246",
             }}
           >
-            Clear Chat
+            Clear Record
           </Typography>
           <Typography
             sx={{
@@ -107,7 +107,7 @@ export default function DeleteAll({ open, onClose, id, ids, setiDs, setCheckedIt
               color: "#287094",
             }}
           >
-            Are you sure you want to clear conversation?
+            Are you sure you want to clear record?
           </Typography>
           <Box
             sx={{
