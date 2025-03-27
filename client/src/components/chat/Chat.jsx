@@ -97,6 +97,7 @@ const Chat = () => {
 
   const handleInputChange = (event) => {
     setInput(event.target.value);
+    setResponse(event.target.value);
   };
 
   const getCursorPosition = () => {
