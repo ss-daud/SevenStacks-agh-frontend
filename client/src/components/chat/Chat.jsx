@@ -27,6 +27,8 @@ import Emr from "../../assets/svgs/Emr";
 import AddpatientModal from "../AddpatientModal";
 import CircularProgress from '@mui/material/CircularProgress';
 import moment from 'moment-timezone';
+import { RotateCcw } from 'lucide-react'
+import { RotateCw } from 'lucide-react'
 
 
 const Chat = () => {
@@ -56,7 +58,15 @@ const Chat = () => {
   const { button, editButton, newButton, editButtoniD } = useButton();
   const [addpatientModal, setaddpatientmodal] = useState(false);
   const [timeZone, setTimeZone] = useState("");
+  const [currentText, setCurrentText] = useState();
 
+  useEffect(() => {
+    setCurrentText(response)
+  }, [response])
+
+  // History states
+  const [history, setHistory] = useState([response]);
+  const [position, setPosition] = useState(0);
   const [isMediumScreen, setIsMediumScreen] = useState(
     window.innerWidth > 50 && window.innerWidth <= 900
   );
@@ -68,6 +78,45 @@ const Chat = () => {
   const handleResize = () => {
     setIsMediumScreen(window.innerWidth > 50 && window.innerWidth <= 900);
   };
+
+  // Handle text changes
+  const handleTextChange = (e) => {
+    const newText = e.target.value;
+    setCurrentText(newText);
+
+    // When we make a new change after undoing, we need to remove the "future" history
+    const newHistory = history.slice(0, position + 1);
+
+    // Add the new text to history
+    setHistory([...newHistory, newText]);
+
+    // Update position to point to the latest edit
+    setPosition(newHistory.length);
+  };
+
+  // Undo function
+  const handleUndo = () => {
+    if (position > 0) {
+      setPosition(position - 1);
+    }
+  };
+
+  // Redo function
+  const handleRedo = () => {
+    if (position < history.length - 1) {
+      setPosition(position + 1);
+    }
+  };
+
+  // Update text when history position changes
+  useEffect(() => {
+    setCurrentText(history[position]);
+  }, [position, history]);
+
+  useEffect(() => {
+    console.log("<----Response---->", response);
+    console.log("<----Input----->", input)
+  }, [response, input])
 
   const updateChatInputs = () => {
     setInput("");
@@ -736,7 +785,7 @@ const Chat = () => {
                   border: "none",
                   display: isLoading ? "flex" : "",
                   justifyContent: isLoading ? "center" : "",
-                  alignItems: isLoading ? "center": "",
+                  alignItems: isLoading ? "center" : "",
                 }}
               >
                 {isLoading && <CircularProgress />}
@@ -771,17 +820,20 @@ const Chat = () => {
                     style={{
                       overflowY: "auto",
                       height: "calc(100vh - 300px)",
-                      padding: 10,
+                      paddingTop: 10,
+                      paddingLeft: 10,
+                      paddingRight: 10,
                       border: "none",
                     }}
                   >
-                    <pre
+                    {/* <pre
                       id="textArea"
                       contentEditable={true}
                       dangerouslySetInnerHTML={{
                         __html: replaceHeaders(response.trim()), // Trim white spaces from the response.
                       }}
                       onBlur={(e) => setResponse(e.target.innerHTML)}
+                      onInput={handleTextChange}
                       style={{
                         whiteSpace: "pre-wrap",   // Wraps text, respects newlines but removes excess space.
                         wordWrap: "break-word",   // Prevents overflow of long words.
@@ -790,6 +842,25 @@ const Chat = () => {
                         outline: "none",          // No outline while editing.
                         width: "100%",            // Full width for consistency.
                         fontFamily: "inherit",    // Inherits the font from parent (you can customize this).
+                      }}
+                    /> */}
+                    <textarea
+                      value={currentText}
+                      onChange={handleTextChange}
+                      rows={10}
+                      cols={50}
+                      className="text-area"
+                      style={{
+                        whiteSpace: "pre-wrap",   // Wraps text, respects newlines but removes excess space.
+                        wordWrap: "break-word",   // Prevents overflow of long words.
+                        margin: 0,                // No additional margins.
+                        padding: 0,               // No additional padding.
+                        outline: "none",          // No outline while editing.
+                        width: "100%",            // Full width for consistency.
+                        fontFamily: "inherit",    // Inherits the font from parent (you can customize this).
+                        height: "calc(100vh - 320px)",
+                        border: "none",
+                        background: "none"
                       }}
                     />
                   </div>
@@ -884,7 +955,7 @@ const Chat = () => {
                         minWidth: "50px",
                         backgroundColor: "#CDE0EA",
                         color: "#023246",
-                        fontSize : "11px",
+                        fontSize: "11px",
                       }}
                       key={i}
                       onClick={() =>
@@ -918,17 +989,45 @@ const Chat = () => {
               response={response}
             /> */}
             <Box>
-              <Button
-                disabled={isLoading || isMicrophoneOn}
-                onClick={handleClick}
-              >
-                <img
-                  src={img1}
-                  alt="Brain"
-                  height={isLargeScreen ? 80 : 45}
-                  width={isLargeScreen ? 80 : 45}
-                />
-              </Button>
+              <Tooltip title='Undo' arrow placement="top">
+                <Button
+                  variant="outlined"
+                  style={{
+                    marginBottom: "10px",
+                    borderRadius: "50%",
+                    width: "50px",
+                    height: "50px",
+                    minWidth: "50px",
+                    backgroundColor: "#CDE0EA",
+                    color: "#023246",
+                    fontSize: "11px",
+                  }}
+                  disabled={isLoading || isMicrophoneOn}
+                  onClick={handleUndo}
+                >
+                  <RotateCcw />
+                </Button>
+              </Tooltip>
+              <Tooltip title='Redo' arrow placement="top">
+                <Button
+                  variant="outlined"
+                  style={{
+                    marginBottom: "10px",
+                    borderRadius: "50%",
+                    width: "50px",
+                    height: "50px",
+                    minWidth: "50px",
+                    backgroundColor: "#CDE0EA",
+                    color: "#023246",
+                    fontSize: "11px",
+                  }}
+                  disabled={isLoading || isMicrophoneOn}
+                  onClick={handleRedo}
+                >
+                  <RotateCw />
+                </Button>
+              </Tooltip>
+
             </Box>
           </Box>
 
@@ -1119,7 +1218,7 @@ const Chat = () => {
             :
             <div></div>
         }
-        <AddpatientModal open={addpatientModal} onClose={() => setaddpatientmodal(false)} setPatientname={setPatientname} fetchRecord={fetchRecord} response={response} handleSubmit={handleSubmit} handlepatientsubmit={handlepatientsubmit} patientname={patientname}/>
+        <AddpatientModal open={addpatientModal} onClose={() => setaddpatientmodal(false)} setPatientname={setPatientname} fetchRecord={fetchRecord} response={response} handleSubmit={handleSubmit} handlepatientsubmit={handlepatientsubmit} patientname={patientname} />
       </div>
     </>
   );
