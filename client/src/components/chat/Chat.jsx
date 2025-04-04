@@ -47,7 +47,7 @@ const Chat = () => {
   const { addTopic, topics, fetchTopics } = useTopic();
   const isScreen = useMediaQuery("(max-width: 1100px)");
   const isLargeScreen = useMediaQuery("(min-width:2000px)");
-  const { data, record, isLoading, error, fetchData, fetchRecord, setRecord, setPatientname, setPatient, patientname } = useOpenAI();
+  const { data, record, isLoading, error, fetchData, fetchRecord, setRecord, setPatientname, setPatient, patientname, currentText, setCurrentText } = useOpenAI();
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [title, setTitle] = useState([]);
   const [isMicrophoneOn, setIsMicrophoneOn] = useState(false);
@@ -55,10 +55,8 @@ const Chat = () => {
   const [previousResponse, setPreviousResponse] = useState("");
   const [adminStatus, setAdminStatus] = useState();
   const responseRef = useRef(null);
-  const { button, editButton, newButton, editButtoniD } = useButton();
+  const { button, editButton, newButton, editButtoniD, trueNewButton, falseEditButton, falseNewButton, editButtons, newButtons } = useButton();
   const [addpatientModal, setaddpatientmodal] = useState(false);
-  const [timeZone, setTimeZone] = useState("");
-  const [currentText, setCurrentText] = useState();
 
   useEffect(() => {
     setCurrentText(response)
@@ -82,8 +80,9 @@ const Chat = () => {
   // Handle text changes
   const handleTextChange = (e) => {
     const newText = e.target.value;
+    setResponse(newText);
     setCurrentText(newText);
-
+    setInput(newText);
     // When we make a new change after undoing, we need to remove the "future" history
     const newHistory = history.slice(0, position + 1);
 
@@ -113,12 +112,9 @@ const Chat = () => {
     setCurrentText(history[position]);
   }, [position, history]);
 
-  useEffect(() => {
-    console.log("<----Response---->", response);
-    console.log("<----Input----->", input)
-  }, [response, input])
-
   const updateChatInputs = () => {
+    falseEditButton();
+    falseNewButton();
     setInput("");
     setBrainInput("");
     setResponse("");
@@ -126,12 +122,6 @@ const Chat = () => {
     setPreviousInput("");
     setPatientname("");
   };
-
-  useEffect(() => {
-    const timeZone = Intl.DateTimeFormat().resolvedOptions().timeZone;
-    const formatTime = moment().tz(timeZone).format("D-MM-YYYY hh:mm a");
-    setTimeZone(formatTime);
-  }, [])
 
   useEffect(() => {
     window.addEventListener("resize", handleResize);
@@ -199,10 +189,13 @@ const Chat = () => {
       return;
     }
 
+    const timeZone = Intl.DateTimeFormat().resolvedOptions().timeZone;
+    const formatTime = moment().tz(timeZone).format("D-MM-YYYY hh:mm a");
+
     const apiObject = {
       response: response || input.replace(/(?:\r\n|\r|\n)/g, "<br>"),
       record: DataRes,
-      timeZone: timeZone
+      timeZone: formatTime
     };
 
     const token = localStorage.getItem("token");
@@ -244,10 +237,14 @@ const Chat = () => {
       return;
     }
 
+
+    const timeZone = Intl.DateTimeFormat().resolvedOptions().timeZone;
+    const formatTime = moment().tz(timeZone).format("D-MM-YYYY hh:mm a");
+
     const apiObject = {
       response: patienWithName.content || input.replace(/(?:\r\n|\r|\n)/g, "<br>"),
       record: patienWithName.record,
-      timeZone: timeZone
+      timeZone: formatTime
     };
 
     const token = localStorage.getItem("token");
@@ -349,9 +346,8 @@ const Chat = () => {
   };
 
   const editButtonClick = async (id) => {
-
     // Get the current content of the big textbox
-    let currentContent = document.querySelector('#textArea')?.innerText;
+    let currentContent = document.querySelector('#textArea')?.value;
     if (!currentContent) {
       currentContent = res;
     }
@@ -359,11 +355,13 @@ const Chat = () => {
     const token = localStorage.getItem("token");
     try {
 
+      const timeZone = Intl.DateTimeFormat().resolvedOptions().timeZone;
+      const formatTime = moment().tz(timeZone).format("D-MM-YYYY hh:mm a");
       // Update the record
       const apiObject = {
         id: id,
         response: currentContent,
-        timeZone: timeZone
+        timeZone: formatTime
       };
 
       const response = await axios.put(`${AUTH_URL}api/topic/UpdateTopic/${id}`,
@@ -726,7 +724,7 @@ const Chat = () => {
   };
 
   const handlebuttonSubmit = async (name) => {
-    newButton();
+    trueNewButton();
     const buttonDataonClick = buttonData.find(x => x.name === name);
     handleGptQuery(buttonDataonClick.text);
   }
@@ -790,7 +788,7 @@ const Chat = () => {
               >
                 {isLoading && <CircularProgress />}
                 {error && response && <p>Error: {error.message}</p>}
-                {!response && !isLoading && reports.length == 0 && (
+                {/* {!response && !isLoading && reports.length == 0 && (
                   <div
                     style={{
                       height: "calc(100vh -300px)",
@@ -814,8 +812,8 @@ const Chat = () => {
                       />
                     )}
                   </div>
-                )}
-                {!isLoading && !error && response && (
+                )} */}
+                {!isLoading && !error && (
                   <div
                     style={{
                       overflowY: "auto",
@@ -845,11 +843,13 @@ const Chat = () => {
                       }}
                     /> */}
                     <textarea
+                      id="textArea"
                       value={currentText}
                       onChange={handleTextChange}
                       rows={10}
                       cols={50}
                       className="text-area"
+                      placeholder="Type here...."
                       style={{
                         whiteSpace: "pre-wrap",   // Wraps text, respects newlines but removes excess space.
                         wordWrap: "break-word",   // Prevents overflow of long words.
@@ -988,7 +988,11 @@ const Chat = () => {
               getChatInput={getChatInput}
               response={response}
             /> */}
-            <Box>
+            <Box sx={{
+              display: "flex",
+              flexDirection: "column",
+              justifyContent: "center",
+            }}>
               <Tooltip title='Undo' arrow placement="top">
                 <Button
                   variant="outlined"
@@ -1057,7 +1061,7 @@ const Chat = () => {
                 backgroundColor: "#CDE0EA ",
                 color: "#023246",
               }}
-              onClick={button && button === 'create' ? () => handleSubmit() : button === 'edit' ? () => editButtonClick(editButtoniD) : undefined}
+              onClick={((editButtons && newButtons) || (!newButtons && editButtons)) ? () => editButtonClick(editButtoniD) : (!editButtons && newButtons) ? () => handleSubmit() : console.warn("Button not clicked")}
             >
               <Save />
             </Button>
@@ -1142,7 +1146,7 @@ const Chat = () => {
         </Box>
 
         {
-          adminStatus ?
+          adminStatus &&
             <div
               style={{
                 width: "100%",
@@ -1215,8 +1219,6 @@ const Chat = () => {
                 </div>
               </div>
             </div>
-            :
-            <div></div>
         }
         <AddpatientModal open={addpatientModal} onClose={() => setaddpatientmodal(false)} setPatientname={setPatientname} fetchRecord={fetchRecord} response={response} handleSubmit={handleSubmit} handlepatientsubmit={handlepatientsubmit} patientname={patientname} />
       </div>

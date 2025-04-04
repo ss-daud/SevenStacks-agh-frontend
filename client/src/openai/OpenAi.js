@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 
 import { API_KEY } from "../../src/api/index";
 import OpenAI from "openai";
@@ -14,13 +14,15 @@ const useOpenAI = () => {
   const [error, setError] = useState(null);
   const [record, setRecord] = useState("");
   const [patientname, setPatientname] = useState("");
+  const [currentText, setCurrentText] = useState();
 
   const fetchData = async (prompt) => {
     setIsLoading(true);
     setError(null);
 
+
     try {
-      const response = await openai.chat.completions.create({
+      const message = await openai.chat.completions.create({
         model: "gpt-4-1106-preview",
         messages: [
           {
@@ -28,7 +30,10 @@ const useOpenAI = () => {
             content:
               `You are a physician that provides answers ready to be put in an electronic medical records system using the best practices in the medical field.
               Be concise, no editorial commands are needed, limit your answer to what is asked of you. Do not refer to external inputs from other physicians.
-              Any answer should be provided as it would be entered in an EMR system by a physician.You are strictly prohibited from providing any kind of value from your end.Dont give any kind of value from your end. Patient Name come should like -Patient Name : [Patient Name], Date of Birth like -Date of Birth : [DOB] and MRN like -MRN : [MRN].`,
+              Any answer should be provided as it would be entered in an EMR system by a physician.You are strictly prohibited from providing any kind of value from your end.Dont give any kind of value from your end. Patient Name come should like -Patient Name : [Patient Name], Date of Birth like -Date of Birth : [DOB] and MRN like -MRN : [MRN].
+              You are given an existing text template ${currentText}. If ${currentText} contains any values, you must retain them and merge them into the new results without modifying or overwriting them.
+              If a field in ${currentText} has a value, use that value. Do not generate dummy or placeholder data for that field. If a field is missing or empty, generate a new value for it.
+              `
           },
           {
             role: "user",
@@ -38,7 +43,7 @@ const useOpenAI = () => {
         temperature: 0,
       });
 
-      const messageContent = response.choices[0]?.message?.content;
+      const messageContent = message.choices[0]?.message?.content;
 
       setData(messageContent);
     } catch (err) {
@@ -131,7 +136,7 @@ const useOpenAI = () => {
 
   }
 
-  return { data, record, isLoading, error, fetchData, fetchRecord, setRecord, setPatientname, setPatient, patientname };
+  return { data, record, isLoading, error, fetchData, fetchRecord, setRecord, setPatientname, setPatient, patientname, currentText, setCurrentText };
 };
 
 export default useOpenAI;
