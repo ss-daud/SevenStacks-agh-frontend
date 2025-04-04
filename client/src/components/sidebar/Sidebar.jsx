@@ -16,6 +16,7 @@ import { useSidebar } from "../../context/SidebarContext";
 import img1 from "../../assets/imgs/toggle.png";
 import SidebarChat from "../SidebarChat/SidebarChat";
 import { TextField } from '@mui/material';
+import { useButton } from "../../context/SaveButtonContext";
 
 const Sidebar = () => {
   const {
@@ -28,13 +29,14 @@ const Sidebar = () => {
     setPreviousInput,
   } = useChatContext();
   const { isSidebarOpen, toggleSidebar } = useSidebar();
-
+  const {newButton} = useButton();
   const [isModalOpen, setIsModalOpen] = useState(false);
   const { topics } = useTopic();
   const [checked, setChecked] = useState(false)
   const [ids, setiDs] = useState([])
   const [searchText, setSearchText] = useState('');
   const [hideChat, setHideChat] = useState(true);
+  const {falseEditButton, falseNewButton} = useButton();
 
   const handleChange = () => {
     if (ids.length === 0) {
@@ -44,6 +46,9 @@ const Sidebar = () => {
     setIsModalOpen(true);
   };
   const updateChatInputs = () => {
+    falseEditButton();
+    falseNewButton();
+    newButton();
     setInput("");
     setBrainInput("");
     setResponse("");

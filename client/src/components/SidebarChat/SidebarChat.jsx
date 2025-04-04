@@ -14,12 +14,12 @@ import Folder from "../../assets/svgs/Folder";
 export default function ({ text, color, res, id, patient, handleCheckChange, checked, setChecked, ids, setiDs, dob }) {
     const { setResponse } = useChatContext();
     const [isOpen, setisOpen] = useState(false);
-    const { button, editButton, newButton, editButtoniD, editiD } = useButton();
+    const { button, editButton, newButton, editButtoniD, editiD, trueEditButton } = useButton();
 
 
     const handleClick = (id, data) => {
         setResponse(data)
-        editButton();
+        trueEditButton();
         editiD(id)
     }
 
