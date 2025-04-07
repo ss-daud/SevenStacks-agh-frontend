@@ -27,6 +27,8 @@ const Sidebar = () => {
     setResponse,
     setReports,
     setPreviousInput,
+    history,
+    setHistory
   } = useChatContext();
   const { isSidebarOpen, toggleSidebar } = useSidebar();
   const {newButton} = useButton();
@@ -46,6 +48,7 @@ const Sidebar = () => {
     setIsModalOpen(true);
   };
   const updateChatInputs = () => {
+    setHistory([]);
     falseEditButton();
     falseNewButton();
     newButton();

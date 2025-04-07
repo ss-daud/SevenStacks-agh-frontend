@@ -13,6 +13,7 @@ export function ChatContextProvider({ children }) {
   const [response, setResponse] = useState(""); // Add data state
   const [reports, setReports] = useState([]);
   const [previousInput, setPreviousInput] = useState("");
+  const [history, setHistory] = useState([response]);
 
   return (
     <ChatContext.Provider
@@ -27,6 +28,8 @@ export function ChatContextProvider({ children }) {
         setReports,
         previousInput,
         setPreviousInput,
+        history,
+        setHistory
       }}
     >
       {children}

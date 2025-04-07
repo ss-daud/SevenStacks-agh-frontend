@@ -31,7 +31,6 @@ const Topbar = () => {
 
     navigate("/");
   };
-console.log("username", username);
   const fetchDataFromAPI = async () => {
     try {
       // Make an API call to fetch the user's data

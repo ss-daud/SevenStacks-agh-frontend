@@ -43,6 +43,8 @@ const Chat = () => {
     setReports,
     previousInput,
     setPreviousInput,
+    history,
+    setHistory
   } = useChatContext();
   const { addTopic, topics, fetchTopics } = useTopic();
   const isScreen = useMediaQuery("(max-width: 1100px)");
@@ -63,7 +65,6 @@ const Chat = () => {
   }, [response])
 
   // History states
-  const [history, setHistory] = useState([response]);
   const [position, setPosition] = useState(0);
   const [isMediumScreen, setIsMediumScreen] = useState(
     window.innerWidth > 50 && window.innerWidth <= 900
@@ -109,7 +110,10 @@ const Chat = () => {
 
   // Update text when history position changes
   useEffect(() => {
-    setCurrentText(history[position]);
+    if (!editButtons && !newButtons) {
+      setCurrentText(history[position]);
+      setInput(history[position]);
+    }
   }, [position, history]);
 
   const updateChatInputs = () => {
@@ -152,8 +156,6 @@ const Chat = () => {
     }
   };
 
-
-
   const getChatInput = (value) => {
     const cursorPosition = getCursorPosition();
     if (cursorPosition !== -1) {
@@ -169,7 +171,19 @@ const Chat = () => {
   };
 
   const getVoiceInput = (value) => {
-    setInput(`${input} ${value}`);
+
+    if (!editButtons && !newButtons) {
+      setInput(`${input} ${value}`);
+
+      const newHistory = history.slice(0, position + 1);
+
+      // Add the new text to history
+      setHistory([...newHistory, `${input} ${value}`]);
+
+      // Update position to point to the latest edit
+      setPosition(newHistory.length);
+    }
+
   };
 
   const getBrainInput = (value) => {
@@ -276,7 +290,7 @@ const Chat = () => {
 
   const handleChatPrint = async () => {
     // Get the current content of the big textbox
-    let currentContent = document.querySelector('#textArea')?.innerText;
+    let currentContent = document.querySelector('#textArea')?.value;
     if (!currentContent) {
       currentContent = res;
     }
@@ -401,7 +415,6 @@ const Chat = () => {
     } catch (error) {
       alert("Error: no template exists for this name");
     }
-    console.log("Handle Save")
   };
 
   const handleTemplate = async () => {
@@ -788,32 +801,34 @@ const Chat = () => {
               >
                 {isLoading && <CircularProgress />}
                 {error && response && <p>Error: {error.message}</p>}
-                {/* {!response && !isLoading && reports.length == 0 && (
+                {!isLoading && (!newButtons && !editButtons) && (
                   <div
                     style={{
-                      height: "calc(100vh -300px)",
+                      height: "calc(100vh - 300px)",
                       display: "flex",
                       overflowY: "auto",
                       padding: 4,
                     }}
                   >
-                    {!isLoading && !error && !response && (
+                    {!isLoading && !error && (
                       <TextField
+                        id="textArea"
                         variant="standard"
                         placeholder="Type here...."
-                        onChange={handleInputChange}
+                        onChange={handleTextChange}
                         value={input}
                         style={{
                           width: "100%",
                           marginLeft: 10,
+                          resize: "none"
                         }}
                         InputProps={{ disableUnderline: true }}
                         multiline
                       />
                     )}
                   </div>
-                )} */}
-                {!isLoading && !error && (
+                )}
+                {!isLoading && !error && response && (newButtons || editButtons) && (
                   <div
                     style={{
                       overflowY: "auto",
@@ -860,7 +875,8 @@ const Chat = () => {
                         fontFamily: "inherit",    // Inherits the font from parent (you can customize this).
                         height: "calc(100vh - 320px)",
                         border: "none",
-                        background: "none"
+                        background: "none",
+                        resize: "none",
                       }}
                     />
                   </div>
@@ -942,8 +958,7 @@ const Chat = () => {
               }}
             >
 
-              {
-                buttonData?.map((buttons, i) => {
+              {buttonData?.map((buttons, i) => {
                   return (
                     <Button
                       variant="outlined"
@@ -964,8 +979,7 @@ const Chat = () => {
                       {buttons.name}
                     </Button>
                   )
-                })
-              }
+                })}
             </div>
             <MicrophoneInput
               data={data}
