@@ -1,4 +1,3 @@
-const API_KEY = import.meta.env.VITE_OPENAI_API_KEY;
 const AUTH_URL = import.meta.env.VITE_BASE_URL;
 
 const REGION = import.meta.env.VITE_REGION;
@@ -9,7 +8,6 @@ const SAMPLING_RATE = import.meta.env.VITE_SAMPLING_RATE;
 
 
 export {
-  API_KEY,
   AUTH_URL,
 
   REGION,

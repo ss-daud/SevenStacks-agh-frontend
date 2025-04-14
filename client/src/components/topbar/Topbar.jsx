@@ -16,6 +16,7 @@ import { TopicProvider } from "../../context/TopicContext";
 import { SidebarProvider, useSidebar } from "../../context/SidebarContext";
 import { AUTH_URL } from "../../api";
 import GreetComp from "../Greeting/GreetComp";
+import decryptionofData from "../../decryption/decryption";
 const Topbar = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [username, setusername] = useState("");
@@ -35,19 +36,21 @@ const Topbar = () => {
     try {
       // Make an API call to fetch the user's data
       const token = localStorage.getItem("token");
-      const response = await axios.get(`${AUTH_URL}api/user/get`, {
+      const encrypt = await axios.get(`${AUTH_URL}api/user/get`, {
         headers: {
           Authorization: `Bearer ${token}`,
         },
       });
 
-      if (response?.data?.user?.userImage) {
+      const response = await decryptionofData(encrypt.data);
+      
+      if (response?.user?.userImage) {
         setImage(
-          `https://ai-emr.s3.amazonaws.com/profile-images/${response?.data?.user?.userImage}`
+          `https://ai-emr.s3.amazonaws.com/profile-images/${response?.user?.userImage}`
         );
       }
-      if (response?.data.user?.username){
-        setusername(response?.data.user?.username);
+      if (response?.user?.username) {
+        setusername(response?.user?.username);
       }
     } catch (error) {
       console.error("Error fetching profile data:", error);

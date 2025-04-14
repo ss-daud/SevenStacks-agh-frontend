@@ -1,12 +1,9 @@
 import { useState } from "react";
 
-import { API_KEY } from "../../src/api/index";
-import OpenAI from "openai";
-
-const openai = new OpenAI({
-  apiKey: API_KEY,
-  dangerouslyAllowBrowser: true,
-});
+import { AUTH_URL } from "../../src/api/index";
+import axios from "axios";
+import encryptionofdata from "../encryption/page";
+import decryptionofData from "../decryption/decryption";
 
 const useOpenAI = () => {
   const [data, setData] = useState("");
@@ -22,30 +19,23 @@ const useOpenAI = () => {
 
 
     try {
-      const message = await openai.chat.completions.create({
-        model: "gpt-4-1106-preview",
-        messages: [
-          {
-            role: "system",
-            content:
-              `You are a physician that provides answers ready to be put in an electronic medical records system using the best practices in the medical field.
-              Be concise, no editorial commands are needed, limit your answer to what is asked of you. Do not refer to external inputs from other physicians.
-              Any answer should be provided as it would be entered in an EMR system by a physician.You are strictly prohibited from providing any kind of value from your end.Dont give any kind of value from your end. Patient Name come should like -Patient Name : [Patient Name], Date of Birth like -Date of Birth : [DOB] and MRN like -MRN : [MRN].
-              You are given an existing text template ${currentText}. If ${currentText} contains any values, you must retain them and merge them into the new results without modifying or overwriting them.
-              If a field in ${currentText} has a value, use that value. Do not generate dummy or placeholder data for that field. If a field is missing or empty, generate a new value for it.
-              `
-          },
-          {
-            role: "user",
-            content: prompt,
-          },
-        ],
-        temperature: 0,
-      });
+      const api_Obj = {
+        sprompt: `You are a physician that provides answers ready to be put in an electronic medical records system using the best practices in the medical field.
+         Be concise, no editorial commands are needed, limit your answer to what is asked of you. Do not refer to external inputs from other physicians.
+         Any answer should be provided as it would be entered in an EMR system by a physician.You are strictly prohibited from providing any kind of value from your end.
+         Dont give any kind of value from your end. Patient Name come should like -Patient Name : [Patient Name], Date of Birth like -Date of Birth : [DOB] and MRN like -MRN : [MRN].`,
+        uprompt: prompt,
+        temperature: 0
+      };
+      const encrypted_payload = encryptionofdata(api_Obj);
 
-      const messageContent = message.choices[0]?.message?.content;
+      const messageContent = await axios.post(
+        `${AUTH_URL}api/user/search`,
+        { encrypted_payload: encrypted_payload }
+      );
 
-      setData(messageContent);
+      const decrypted_data = await decryptionofData(messageContent.data.encrypted_response);
+      setData(decrypted_data.encrypted_response);
     } catch (err) {
       setError(err);
     } finally {
@@ -57,25 +47,21 @@ const useOpenAI = () => {
     setIsLoading(true);
     setError(null);
     try {
-      const recordresponse = await openai.chat.completions.create({
-        model: "gpt-4-1106-preview",
-        messages: [
-          {
-            role: "system",
-            content: `You are acting like a name completion alogrithm. I will provide you text in which you have to find Patient name and set this value ${patientname} for patient's name. Don't change any other value in text there. Just update patient's name.`,
-          },
-          {
-            role: "user",
-            content: prompt,
-          },
-        ],
-        temperature: 0.5,
-      });
+      const api_Obj = {
+        sprompt: `You are acting like a name completion alogrithm. I will provide you text in which you have to find Patient name and set this value ${patientname} for patient's name. Don't change any other value in text there. Just update patient's name.`,
+        uprompt: prompt,
+        temperature: 0.5
+      };
+      const encrypted_payload = encryptionofdata(api_Obj);
+      const messageContent = await axios.post(
+        `${AUTH_URL}api/user/search`,
+        { encrypted_payload: encrypted_payload }
+      )
 
-      const recordContent = recordresponse.choices[0]?.message?.content;
-      setData(recordContent);
-      const datarecord = await fetchRecord(recordContent);
-      return { record: datarecord, content: recordContent };
+      const decrypted_res = await decryptionofData(messageContent.data.encrypted_response);
+      setData(decrypted_res.encrypted_response);
+      const datarecord = await fetchRecord(decrypted_res.encrypted_response);
+      return { record: datarecord, content: decrypted_res.encrypted_response };
     } catch (error) {
       setError(error)
     } finally {
@@ -88,44 +74,41 @@ const useOpenAI = () => {
     setError(null);
 
     try {
+      const api_Obj = {
+        sprompt: `Extract patient details from the provided text and return **only a valid JSON object**.
+      - Do **not** include extra text, explanations, or markdown.  
+      - Date format should be **YYYY-MM-DD**.  
+      - JSON keys should be: **"Patient_Name"**, **"DOB"**, and **"MRN"**.
+      - **Do not return null values or placeholders untill you dont find any value.Make sure If you didnot find any value for "DOB" and "MRN" return null for that value.If you didnot find "Patient_Name" return a string "Patient Name". If you find this - Patient Name: [Patient's Full Name] this means patient name is not available so in this case return null**
 
-      const recordresponse = await openai.chat.completions.create({
-        model: "gpt-4-1106-preview",
-        messages: [
-          {
-            role: "user",
-            content: `Extract patient details from the provided text and return **only a valid JSON object**.  
-- Do **not** include extra text, explanations, or markdown.  
-- Date format should be **YYYY-MM-DD**.  
-- JSON keys should be: **"Patient_Name"**, **"DOB"**, and **"MRN"**.  
-- **Do not return null values or placeholders untill you dont find any value.Make sure If you didnot find any value for "DOB" and "MRN" return null for that value.If you didnot find "Patient_Name" return a string "Patient Name". If you find this - Patient Name: [Patient's Full Name] this means patient name is not available so in this case return null**
+      **Example Input:**  
+      "
+       Patient Name: Major tester
+       Date of Birth: 11-01-2002
+       MRN: 972346
+      "
 
-**Example Input:**  
-"
- Patient Name: Major tester
- Date of Birth: 11-01-2002
- MRN: 972346
-"
+      **Expected Output:**  
+      {"Patient_Name": "Daud Mir", "DOB": "1985-03-15", "MRN": "123456"}
+      **Above output is just dummy to make you understand the thing.**`,
+        uprompt: prompt,
+        temperature: 0
+      };
 
-**Expected Output:**  
-{"Patient_Name": "Daud Mir", "DOB": "1985-03-15", "MRN": "123456"}
-**Above output is just dummy to make you understand the thing.**
-`
-          },
-          {
-            role: "user",
-            content: prompt,
-          },
-        ],
-        temperature: 0,
-      });
-      var recordContent = recordresponse.choices[0]?.message?.content;
+      const encrypted_payload = encryptionofdata(api_Obj);
 
-      if (!recordContent.startsWith("{")) {
-        recordContent = recordContent.replace(/```json|```/g, "").trim();
+      const messageContent = await axios.post(
+        `${AUTH_URL}api/user/search`,
+        { encrypted_payload: encrypted_payload }
+      )
+      const decrypted_res = await decryptionofData(messageContent.data.encrypted_response);
+      const recordedContent = decrypted_res.encrypted_response;
+
+      if (!recordedContent.startsWith("{")) {
+        recordedContent = recordedContent.replace(/```json|```/g, "").trim();
       }
 
-      const parsedContent = JSON.parse(recordContent)
+      const parsedContent = JSON.parse(recordedContent);
       // setRecord(parsedContent);
       return parsedContent;
     } catch (err) {
@@ -133,7 +116,6 @@ const useOpenAI = () => {
     } finally {
       setIsLoading(false);
     }
-
   }
 
   return { data, record, isLoading, error, fetchData, fetchRecord, setRecord, setPatientname, setPatient, patientname, currentText, setCurrentText };
