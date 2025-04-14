@@ -22,6 +22,7 @@ import SuccessModal from "./SuccessModal";
 import { AUTH_URL } from "../api";
 import PasswordModal from "./modals/PasswordModal";
 import { AlternateEmail } from "@mui/icons-material";
+import decryptionofData from '../decryption/decryption'
 
 const style = {
   position: "absolute",
@@ -88,26 +89,26 @@ export default function ProfileModal({ open, onClose }) {
     try {
       // Make an API call to fetch the user's data
       const token = localStorage.getItem("token");
-      const response = await axios.get(`${AUTH_URL}api/user/get`, {
+      const encrypted = await axios.get(`${AUTH_URL}api/user/get`, {
         headers: {
           Authorization: `Bearer ${token}`,
         },
       });
 
-      setFetchedData(response?.data);
+      const response = await decryptionofData(encrypted.data);
 
-      if (response?.data?.user?.userImage) {
+      if (response?.user?.userImage) {
         setImage(
-          `https://ai-emr.s3.amazonaws.com/profile-images/${response?.data?.user?.userImage}`
+          `https://ai-emr.s3.amazonaws.com/profile-images/${response?.user?.userImage}`
         );
         setPrevImage(
-          `https://ai-emr.s3.amazonaws.com/profile-images/${response?.data?.user?.userImage}`
+          `https://ai-emr.s3.amazonaws.com/profile-images/${response?.user?.userImage}`
         );
       }
 
       formik.setValues({
-        name: response?.data?.user?.name,
-        email: response?.data?.user?.email,
+        name: response?.user?.name,
+        email: response?.user?.email,
       });
     } catch (error) {
       console.error("Error fetching profile data:", error);
@@ -133,7 +134,7 @@ export default function ProfileModal({ open, onClose }) {
     reader.onload = function () {
       cb(reader.result);
     };
-    reader.onerror = function (error) {};
+    reader.onerror = function (error) { };
   };
 
   const formik = useFormik({
@@ -145,7 +146,7 @@ export default function ProfileModal({ open, onClose }) {
     onSubmit: async (values) => {
       const token = localStorage.getItem("token");
       if (image !== prevImage) {
-        console.log("image");
+        
         const formData = new FormData();
         if (image) {
           formData.append("image", image);
@@ -153,7 +154,7 @@ export default function ProfileModal({ open, onClose }) {
 
         setLoader(true);
         try {
-          const response = await axios.put(
+          const encrypt = await axios.put(
             `${AUTH_URL}api/user/update`,
             formData,
             {
@@ -163,8 +164,8 @@ export default function ProfileModal({ open, onClose }) {
               },
             }
           );
-          console.log(response);
-          if (response?.data?.message == "User updated successfully") {
+        const response = decryptionofData(encrypt.data)
+          if (response?.message == "User updated successfully") {
             setIsModalOpen(true);
             onClose();
           }
@@ -174,14 +175,13 @@ export default function ProfileModal({ open, onClose }) {
           setLoader(false);
         }
       } else {
-        console.log("dsata");
         const formData = new FormData();
         formData.append("name", values.name);
         formData.append("email", values.email);
 
         setLoader(true);
         try {
-          const response = await axios.put(
+          const encrypt = await axios.put(
             `${AUTH_URL}api/user/update`,
             formData,
             {
@@ -191,17 +191,16 @@ export default function ProfileModal({ open, onClose }) {
               },
             }
           );
-          if (response?.data?.message == "User updated successfully") {
+          const response = await decryptionofData(encrypt.data);
+          if (response?.message == "User updated successfully") {
             onClose();
           }
         } catch (error) {
-          if (error.response && error.response.data) {
-            alert(error?.response?.data?.message);
-          } else {
-            console.error("Error saving profile:", error.message);
+          const decrypt = await decryptionofData(error.response.data)
+          if (decrypt) {
+            alert(decrypt.message);
+            console.error("Error saving profile:", decrypt);
           }
-
-          console.error("Error saving profile:", error);
         } finally {
           setLoader(false);
         }

@@ -17,6 +17,7 @@ import { Box } from "@mui/material";
 import "./resetpassword.css";
 import { useNavigate } from "react-router-dom";
 import CircularProgress from "@mui/material/CircularProgress";
+import decryptionofdata from '../../decryption/decryption';
 
 const CustomTextField = styled(TextField)({
   "& .MuiInputBase-root": {
@@ -76,23 +77,19 @@ export default function ResetPassword() {
       if (values.password !== values.confirmPassword) {
         alert("Passwords do not match");
       } else {
-        const apiObject = {
-          email: localStorage.getItem("email"),
-          password: values.password,
-        };
         setLoader(true);
         try {
-          const response = await axios.post(
+          const encrypt = await axios.post(
             `${AUTH_URL}api/user/resetpassword`,
             {
               email: localStorage.getItem("email"),
               password: values.password,
             }
           );
-
+          const response = await decryptionofdata(encrypt.data);
           // Check the response status and handle accordingly
-          if (response.status === 200) {
-            alert("Password updated successfully!");
+          if (response.success) {
+            alert(response.message);
             navigate("/");
           } else {
             alert("Password update failed. Please try again.");

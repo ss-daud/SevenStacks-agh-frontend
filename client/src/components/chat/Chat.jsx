@@ -27,6 +27,9 @@ import Emr from "../../assets/svgs/Emr";
 import AddpatientModal from "../AddpatientModal";
 import CircularProgress from '@mui/material/CircularProgress';
 import moment from 'moment-timezone';
+import decryptionofData from "../../decryption/decryption";
+
+import encryptionofdata from "../../encryption/page";
 
 
 const Chat = () => {
@@ -155,12 +158,13 @@ const Chat = () => {
       timeZone: timeZone
     };
 
+    const encrypted_res = await encryptionofdata(apiObject);
+
     const token = localStorage.getItem("token");
 
     try {
-      const response = await axios.post(
-        `${AUTH_URL}api/topic/create`,
-        apiObject,
+      const encrypted_response = await axios.post(
+        `${AUTH_URL}api/topic/create`, { encrypted_res: encrypted_res },
         {
           headers: {
             Authorization: `Bearer ${token}`,
@@ -169,8 +173,10 @@ const Chat = () => {
         }
       );
 
-      if (response?.data?.newTopic) {
-        addTopic(response?.data?.newTopic);
+      const response = await decryptionofData(encrypted_response.data);
+
+      if (response?.newTopic) {
+        addTopic(response?.newTopic);
         await fetchTopics();
       }
 
@@ -202,10 +208,13 @@ const Chat = () => {
 
     const token = localStorage.getItem("token");
 
+    const encrypted_res = await encryptionofdata(apiObject);
+
+
     try {
-      const response = await axios.post(
+      const encrypted_res_back = await axios.post(
         `${AUTH_URL}api/topic/create`,
-        apiObject,
+        { encrypted_res: encrypted_res },
         {
           headers: {
             Authorization: `Bearer ${token}`,
@@ -213,9 +222,9 @@ const Chat = () => {
           },
         }
       );
-
-      if (response?.data?.newTopic) {
-        addTopic(response?.data?.newTopic);
+      const response = await decryptionofData(encrypted_res_back.data);
+      if (response?.newTopic) {
+        addTopic(response?.newTopic);
         await fetchTopics();
       }
 
@@ -286,7 +295,9 @@ const Chat = () => {
           "Content-Type": "application/json",
         },
       });
-      if (response?.data?.responses.length != 0) {
+
+      const decrypted_res = await decryptionofData(response);
+      if (decrypted_res?.responses.length != 0) {
         setReports(response?.data?.responses);
       } else {
         setReports([""]);
@@ -316,14 +327,18 @@ const Chat = () => {
         timeZone: timeZone
       };
 
+      const encrypted_payload = await encryptionofdata(apiObject);
+
       const response = await axios.put(`${AUTH_URL}api/topic/UpdateTopic/${id}`,
-        apiObject,
+        { encrypted_payload: encrypted_payload },
         {
           headers: {
             Authorization: `Bearer ${token}`,
             "Content-Type": "application/json",
           },
         });
+      const decrypted_res = await decryptionofData(response.data);
+
       if (response.status === 200) {
         alert("Record saved successfully.");
         // success
@@ -345,7 +360,9 @@ const Chat = () => {
         },
       });
 
-      const topics = response.data.topics;
+      const decrypted = await decryptionofData(response.data.encrypted_response);
+
+      const topics = decrypted.topics;
 
       const allResponses = topics.map((topic) => topic.response);
 
@@ -353,7 +370,6 @@ const Chat = () => {
     } catch (error) {
       alert("Error: no template exists for this name");
     }
-    console.log("Handle Save")
   };
 
   const handleTemplate = async () => {
@@ -387,15 +403,19 @@ const Chat = () => {
       name: textAfterComprehensive,
     };
 
+    const encrypted_payload = await encryptionofdata(apiObject);
+
     try {
       const response = await axios.get(`${AUTH_URL}api/template`, {
-        params: apiObject,
+        params: encrypted_payload,
         headers: {
           Authorization: `Bearer ${token}`,
         },
       });
 
-      return response?.data?.template || "";
+      const encrypted_response = await encryptionofdata(response);
+
+      return encrypted_response?.data?.template || "";
     } catch (error) {
       alert("Error: no template exists for this name");
     }
@@ -631,12 +651,13 @@ const Chat = () => {
     try {
       // Make an API call to fetch the user's data
       const token = localStorage.getItem("token");
-      const response = await axios.get(`${AUTH_URL}api/user/get`, {
+      const encrypt = await axios.get(`${AUTH_URL}api/user/get`, {
         headers: {
           Authorization: `Bearer ${token}`,
         },
       });
-      setAdminStatus(response?.data?.user?.isAdmin);
+      const response = await decryptionofData(encrypt.data);
+      setAdminStatus(response?.user?.isAdmin);
     } catch (error) {
       console.error("Error fetching profile data:", error);
     }
@@ -645,7 +666,8 @@ const Chat = () => {
   const fetchbuttonsData = async () => {
     try {
       const res = await axios.get(`${AUTH_URL}api/buttons/list`);
-      setButtonData(res.data.buttons);
+      const decrypted_data = await decryptionofData(res.data.encryptedResponse);
+      setButtonData(decrypted_data.buttons);
     } catch (error) {
       console.error("Error fetching buttons data:", error);
     }
@@ -680,10 +702,13 @@ const Chat = () => {
     const buttonDataonClick = buttonData.find(x => x.name === name);
     handleGptQuery(buttonDataonClick.text);
   }
+
   useEffect(() => {
     fetchbuttonsData();
     fetchDataFromAPI();
   }, []);
+
+   
 
   return (
     <>
@@ -735,7 +760,7 @@ const Chat = () => {
                   border: "none",
                   display: isLoading ? "flex" : "",
                   justifyContent: isLoading ? "center" : "",
-                  alignItems: isLoading ? "center": "",
+                  alignItems: isLoading ? "center" : "",
                 }}
               >
                 {isLoading && <CircularProgress />}
@@ -870,8 +895,7 @@ const Chat = () => {
               }}
             >
 
-              {
-                buttonData?.map((buttons, i) => {
+              {buttonData?.map((buttons, i) => {
                   return (
                     <Button
                       variant="outlined"

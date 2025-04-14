@@ -18,6 +18,7 @@ import { Box } from "@mui/material";
 import "./login.css";
 import EmailOutlined from "@mui/icons-material/EmailOutlined";
 import { Link, useNavigate } from "react-router-dom";
+import decryptionofData from '../../decryption/decryption'
 
 const CustomTextField = styled(TextField)({
   "& .MuiInputBase-root": {
@@ -76,18 +77,20 @@ export default function Login() {
         password: values.password,
         userInput: values.emailOrUsername,
       };
+       
       setLoader(true);
       localStorage.setItem("email", values.emailOrUsername);
 
       try {
-        const response = await axios.post(
+        const encrypted = await axios.post(
           `${AUTH_URL}api/user/login`,
           apiObject
         );
+        const response = await decryptionofData(encrypted.data.encrypted_data);
 
-        if (response?.data?.token) {
-          localStorage.setItem("token", response.data.token);
-          if (response.data.isPasswordActive === false) {
+        if (response?.token) {
+          localStorage.setItem("token", response.token);
+          if (response.isPasswordActive === false) {
             navigate("/change-password");
           } else {
             navigate("/home");
@@ -96,11 +99,15 @@ export default function Login() {
           alert("Token not found in the response.");
         }
       } catch (err) {
-        if (err.response.data.message == "Account Not Found") {
-          setError("Account Not Found");
-        } else {
-          setError("Wrong email or password");
-        }
+        const decrypted_error = await decryptionofData(err.response.data); 
+        // if ((decrypted_error.message === "Account Not Found")) {
+        //   setError("Account Not Found");
+        // }else if{
+
+        // } else {
+        //   setError("Wrong email or password");
+        // }
+        setError(decrypted_error.message);
       } finally {
         setLoader(false);
       }

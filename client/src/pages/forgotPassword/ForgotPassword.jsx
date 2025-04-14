@@ -21,6 +21,8 @@ import { ErrorOutline } from "@mui/icons-material";
 import "./forgotpassword.css";
 import EmailOutlined from "@mui/icons-material/EmailOutlined";
 import { Link, NavLink, useNavigate } from "react-router-dom";
+import decryptionofdata from "../../decryption/decryption";
+import decryptionofData from "../../decryption/decryption";
 
 const CustomTextField = styled(TextField)({
   "& .MuiInputBase-root": {
@@ -68,22 +70,23 @@ export default function ForgotPassword() {
       setLoader(true);
       try {
         // Make a POST request to check if the email exists
-        const response = await axios.post(
+        const encrypted_res = await axios.post(
           `${AUTH_URL}api/user/forgotPassword`,
           {
             email: values.email,
           }
         );
-
-        if (response.data) {
-          alert("otp has been send to your registered email address");
+        const response = await decryptionofdata(encrypted_res.data);
+        if (response) {
+          alert(response.message);
           navigate("/otp");
         } else {
           // If the email does not exist, show an error message or handle it as needed
           alert("Email not found. Please check your email address.");
         }
       } catch (err) {
-        alert(err.message);
+        const error = await decryptionofData(err.response.data);
+        alert(error.message);
       } finally {
         setLoader(false);
       }

@@ -9,6 +9,7 @@ import { useNavigate } from "react-router-dom";
 import { useState } from "react";
 import { AUTH_URL } from "../api";
 import CircularProgress from "@mui/material/CircularProgress";
+import decryptionofdata from '../decryption/decryption'
 
 const style = {
   position: "absolute",
@@ -41,9 +42,15 @@ export default function KeepMountedModal({ open, onClose }) {
       const data = {
         email: email,
       };
-      await axios.delete(`${AUTH_URL}api/user/delete`, { data });
-      alert("account deleted successfully");
-      handleLogout();
+      const encrypt = await axios.delete(`${AUTH_URL}api/user/delete`, { data });
+      const response = await decryptionofdata(encrypt.data);
+      if (response.success) {
+        alert(response.message); 
+        handleLogout();
+      }
+      else{
+        alert(response.message);
+      }
     } catch (error) {
       console.error("Error deleting account:", error);
     } finally {

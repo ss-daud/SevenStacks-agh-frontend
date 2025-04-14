@@ -6,6 +6,7 @@ import { useNavigate } from "react-router-dom";
 import { useStyles } from "../styles/Styles";
 import axios from "axios";
 import "./otp.css";
+import decryptionofdata from "../../decryption/decryption";
 
 function ForgetOTP() {
   const navigate = useNavigate();
@@ -54,7 +55,7 @@ function ForgetOTP() {
       if (response.ok) {
         navigate("/resetpassword");
       } else {
-        alert("otp verification failed");
+        alert("Otp verification failed");
         console.error("OTP verification failed");
       }
     } catch (error) {
@@ -68,11 +69,11 @@ function ForgetOTP() {
     const _email = localStorage.getItem("email");
 
     // Make a POST request to check if the email exists
-    const response = await axios.post(`${AUTH_URL}api/user/forgotPassword`, {
+    const encrypt = await axios.post(`${AUTH_URL}api/user/forgotPassword`, {
       email: _email,
     });
-
-    if (response.data) {
+    const response = await decryptionofdata(encrypt.data);
+    if (response.message) {
       alert("otp has been send again on your registered email address");
     } else {
       // If the email does not exist, show an error message or handle it as needed
