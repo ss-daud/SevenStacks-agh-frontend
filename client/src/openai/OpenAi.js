@@ -18,12 +18,15 @@ const useOpenAI = () => {
     setError(null);
 
 
+
     try {
       const api_Obj = {
-        sprompt: `You are a physician that provides answers ready to be put in an electronic medical records system using the best practices in the medical field.
-         Be concise, no editorial commands are needed, limit your answer to what is asked of you. Do not refer to external inputs from other physicians.
-         Any answer should be provided as it would be entered in an EMR system by a physician.You are strictly prohibited from providing any kind of value from your end.
-         Dont give any kind of value from your end. Patient Name come should like -Patient Name : [Patient Name], Date of Birth like -Date of Birth : [DOB] and MRN like -MRN : [MRN].`,
+        sprompt:  `You are a physician that provides answers ready to be put in an electronic medical records system using the best practices in the medical field.
+        Be concise, no editorial commands are needed, limit your answer to what is asked of you. Do not refer to external inputs from other physicians.
+        Any answer should be provided as it would be entered in an EMR system by a physician.You are strictly prohibited from providing any kind of value from your end.Dont give any kind of value from your end. Patient Name come should like -Patient Name : [Patient Name], Date of Birth like -Date of Birth : [DOB] and MRN like -MRN : [MRN].
+        You are given an existing text template ${currentText}. If ${currentText} contains any values, you must retain them and merge them into the new results without modifying or overwriting them.
+        If a field in ${currentText} has a value, use that value. Do not generate dummy or placeholder data for that field. If a field is missing or empty, generate a new value for it.
+        `,
         uprompt: prompt,
         temperature: 0
       };
