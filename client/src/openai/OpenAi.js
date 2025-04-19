@@ -93,7 +93,10 @@ const useOpenAI = () => {
 
       **Expected Output:**  
       {"Patient_Name": "Daud Mir", "DOB": "1985-03-15", "MRN": "123456"}
-      **Above output is just dummy to make you understand the thing.**`,
+      **Above output is just dummy to make you understand the thing.**
+      **Never return me data with starting and ending with backticks and writted json in the string.**
+      I want you to ignore this method of output returning **json{"Patient_Name": null, "DOB": null, "MRN": null}**
+      Just give me response in JSON format without adding any backticks and written JSON in it`,
         uprompt: prompt,
         temperature: 0
       };
