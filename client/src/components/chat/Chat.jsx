@@ -147,16 +147,11 @@ const Chat = () => {
   };
 
   const getCursorPosition = () => {
-    const selection = window.getSelection();
-    if (selection.rangeCount > 0) {
-      const range = selection.getRangeAt(0);
-      const { startContainer, startOffset } = range;
-
-      // The cursor position
-      const cursorPosition = startOffset;
-
-      return cursorPosition;
+    const textArea = document.getElementById("textArea");
+    if (textArea) {
+      return textArea.selectionStart;
     }
+    return -1; // Return -1 if textArea not found or no selection
   };
 
   const getChatInput = (value) => {
@@ -173,20 +168,99 @@ const Chat = () => {
     }
   };
 
-  const getVoiceInput = (value) => {
-
-    if (!editButtons && !newButtons) {
-      setInput(`${input} ${value}`);
-
+  const getVoiceInput = (value, storedCursorPos = -1) => {
+    // Get the cursor position and the textarea element
+    const textArea = document.getElementById("textArea");
+    // Use the stored cursor position from MicrophoneInput if available
+    let cursorPos = storedCursorPos !== -1 ? storedCursorPos : (textArea ? textArea.selectionStart : -1);
+    console.log("Using cursor position:", cursorPos);
+    
+    // Clean value from any HTML that might be coming from voice input
+    const cleanValue = value.replace(/<[^>]*>/g, "");
+    
+    // If in edit or new mode, use currentText as the base
+    if (editButtons || newButtons) {
+      let newText;
+      let newCursorPos;
+  
+      // If no valid cursor position, append to the end
+      if (cursorPos === -1 || cursorPos === undefined) {
+        newText = `${currentText || ''} ${cleanValue}`.trim();
+        newCursorPos = newText.length; // Set cursor at the end
+      } else {
+        // Insert at cursor position
+        const beforeCursor = currentText.substring(0, cursorPos);
+        const afterCursor = currentText.substring(cursorPos);
+        newText = `${beforeCursor} ${cleanValue} ${afterCursor}`.trim();
+        newCursorPos = cursorPos + cleanValue.length + 1; // +1 for the space before the value
+      }
+  
+      // Store the final cursor position
+      const finalCursorPos = newCursorPos;
+      
+      // Use a callback function to ensure state updates happen together
+      const updateTextAndCursor = () => {
+        setCurrentText(newText);
+        setInput(newText);
+        
+        // Force a manual focus and cursor position after the state update
+        window.requestAnimationFrame(() => {
+          const updatedTextArea = document.getElementById("textArea");
+          if (updatedTextArea) {
+            updatedTextArea.focus();
+            updatedTextArea.setSelectionRange(finalCursorPos, finalCursorPos);
+            
+            // Scroll to make cursor visible if needed
+            const lineHeight = parseInt(window.getComputedStyle(updatedTextArea).lineHeight);
+            const cursorLine = newText.substr(0, finalCursorPos).split('\n').length;
+            updatedTextArea.scrollTop = (cursorLine - 1) * lineHeight;
+          }
+        });
+      };
+      
+      // Execute update function
+      updateTextAndCursor();
+    } else {
+      // Original behavior for non-edit mode
+      let newText;
+      let newCursorPos;
+      
+      if (cursorPos === -1 || cursorPos === undefined) {
+        newText = `${input || ''} ${cleanValue}`.trim();
+        newCursorPos = newText.length; // Set cursor at the end
+      } else {
+        // Insert at cursor position
+        const beforeCursor = input.substring(0, cursorPos);
+        const afterCursor = input.substring(cursorPos);
+        newText = `${beforeCursor} ${cleanValue} ${afterCursor}`.trim();
+        newCursorPos = cursorPos + cleanValue.length + 1; // +1 for the space before the value
+      }
+      
+      // Store the final cursor position
+      const finalCursorPos = newCursorPos;
+      
+      // Update input with the new text
+      setInput(newText);
+      
+      // Force a manual focus and cursor position after the state update
+      window.requestAnimationFrame(() => {
+        const updatedTextArea = document.getElementById("textArea");
+        if (updatedTextArea) {
+          updatedTextArea.focus();
+          updatedTextArea.setSelectionRange(finalCursorPos, finalCursorPos);
+          
+          // Scroll to make cursor visible if needed
+          const lineHeight = parseInt(window.getComputedStyle(updatedTextArea).lineHeight);
+          const cursorLine = newText.substr(0, finalCursorPos).split('\n').length;
+          updatedTextArea.scrollTop = (cursorLine - 1) * lineHeight;
+        }
+      });
+  
+      // Update history
       const newHistory = history.slice(0, position + 1);
-
-      // Add the new text to history
-      setHistory([...newHistory, `${input} ${value}`]);
-
-      // Update position to point to the latest edit
+      setHistory([...newHistory, newText]);
       setPosition(newHistory.length);
     }
-
   };
 
   const getBrainInput = (value) => {
@@ -770,7 +844,11 @@ const Chat = () => {
     fetchDataFromAPI();
   }, []);
 
-   
+  function recordAtCursorPosition() {
+    const textArea = document.getElementById("textArea");
+    let cursorPosition = textArea.selectionStart;
+    return cursorPosition;
+  }
 
   return (
     <>
@@ -1016,6 +1094,12 @@ const Chat = () => {
               isBrainEngaged={isBrainEngaged}
               previousInput={previousInput}
               addPreviouseInput={addPreviouseInput}
+              setResponse={setResponse}
+              setInput={setInput}
+              currentText={currentText}
+              setCurrentText={setCurrentText}
+              editButtons={editButtons}
+              newButtons={newButtons}
             />
             {/* <AWS_Mic
               getVoiceInput={getVoiceInput}
