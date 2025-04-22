@@ -1,28 +1,22 @@
 import { Box, Checkbox, Collapse, Container, ListItem, Select, Typography } from "@mui/material";
-import Message from "../../assets/svgs/Message";
 import EllipsisText from "../text/EllipsiText";
 import KeyboardArrowDownIcon from "@mui/icons-material/KeyboardArrowDown";
 import { useChatContext } from "../../context/ChatContext";
-import { useEffect, useState } from "react";
-import Save from "../../assets/svgs/Save";
-import axios from "axios";
-import { AUTH_URL } from "../../api";
-import useOpenAI from "../../openai/OpenAi";
+import { useState } from "react";
 import { useButton } from "../../context/SaveButtonContext";
-import Folder from "../../assets/svgs/Folder";
+import EditPatientModal from "../EditPatientModal";
 
 export default function ({ text, color, res, id, patient, handleCheckChange, checked, setChecked, ids, setiDs, dob }) {
     const { setResponse } = useChatContext();
     const [isOpen, setisOpen] = useState(false);
     const { button, editButton, newButton, editButtoniD, editiD, trueEditButton } = useButton();
-
+    const [isModalOpen, setIsModalOpen]= useState(false);
 
     const handleClick = (id, data) => {
         setResponse(data)
         trueEditButton();
         editiD(id)
     }
-
 
 
     return (
@@ -39,7 +33,11 @@ export default function ({ text, color, res, id, patient, handleCheckChange, che
                 cursor: "pointer",
                 transition: "background-color 0.3s ease-in-out",
                 "&:hover": { backgroundColor: `${color}40` },
-            }}>
+            }}
+                onDoubleClick={() => {
+                    setIsModalOpen(true)
+                }}
+            >
                 <Box sx={{ flex: 1 }}>
                     <Checkbox
                         checked={checked?.[id] || false}
@@ -116,6 +114,7 @@ export default function ({ text, color, res, id, patient, handleCheckChange, che
                     }
                 </Box>
             </Collapse>
+            <EditPatientModal open={isModalOpen} onClose={() => setIsModalOpen(false)} text={text} id={id}/>
         </Box>
     )
 }

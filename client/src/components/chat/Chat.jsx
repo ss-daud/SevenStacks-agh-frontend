@@ -388,11 +388,20 @@ const Chat = () => {
           <title>Print</title>
           <style>
             body {
-              font-family: 'Arial', sans-serif;
-              margin: 0;
+              font-family: Arial, sans-serif;
+              margin: 20px;
+              line-height: 1.5;
+              font-size: 12px;
             }
             pre {
               white-space: pre-wrap; /* Preserve white space */
+              font-family: Arial, sans-serif;
+              font-size: 12px;
+            }
+            @media print {
+              body {
+                font-family: Arial, sans-serif;
+              }
             }
           </style>
         </head>
