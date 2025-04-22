@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 import { AUTH_URL } from "../../src/api/index";
 import axios from "axios";
@@ -12,6 +12,29 @@ const useOpenAI = () => {
   const [record, setRecord] = useState("");
   const [patientname, setPatientname] = useState("");
   const [currentText, setCurrentText] = useState();
+  const [userId, setUserId] = useState('');
+
+  const fetchDataFromAPI = async () => {
+    try {
+      // Make an API call to fetch the user's data
+      const token = localStorage.getItem("token");
+      const encrypt = await axios.get(`${AUTH_URL}api/user/get`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
+      const response = await decryptionofData(encrypt.data);
+      setUserId(response.user._id)
+      
+     
+    } catch (error) {
+      console.error("Error fetching profile data:", error);
+    }
+  };
+  useEffect(() => {
+    fetchDataFromAPI();
+  }, []);
 
   const fetchData = async (prompt) => {
     setIsLoading(true);
@@ -28,7 +51,8 @@ const useOpenAI = () => {
         If a field in ${currentText} has a value, use that value. Do not generate dummy or placeholder data for that field. If a field is missing or empty, generate a new value for it.
         `,
         uprompt: prompt,
-        temperature: 0
+        temperature: 0,
+        userId
       };
       const encrypted_payload = encryptionofdata(api_Obj);
 
@@ -53,7 +77,8 @@ const useOpenAI = () => {
       const api_Obj = {
         sprompt: `You are acting like a name completion alogrithm. I will provide you text in which you have to find Patient name and set this value ${patientname} for patient's name. Don't change any other value in text there. Just update patient's name.`,
         uprompt: prompt,
-        temperature: 0.5
+        temperature: 0.5,
+        userId
       };
       const encrypted_payload = encryptionofdata(api_Obj);
       const messageContent = await axios.post(
@@ -98,7 +123,8 @@ const useOpenAI = () => {
       I want you to ignore this method of output returning **json{"Patient_Name": null, "DOB": null, "MRN": null}**
       Just give me response in JSON format without adding any backticks and written JSON in it`,
         uprompt: prompt,
-        temperature: 0
+        temperature: 0,
+        userId
       };
 
       const encrypted_payload = encryptionofdata(api_Obj);
