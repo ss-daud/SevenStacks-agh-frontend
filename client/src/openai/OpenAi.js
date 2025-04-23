@@ -4,6 +4,7 @@ import { AUTH_URL } from "../../src/api/index";
 import axios from "axios";
 import encryptionofdata from "../encryption/page";
 import decryptionofData from "../decryption/decryption";
+import { useChatContext } from "../context/ChatContext";
 
 const useOpenAI = () => {
   const [data, setData] = useState("");
@@ -13,6 +14,8 @@ const useOpenAI = () => {
   const [patientname, setPatientname] = useState("");
   const [currentText, setCurrentText] = useState();
   const [userId, setUserId] = useState('');
+  const { selectedOutputLanguage, setSelectedOutputLanguage } = useChatContext();
+
 
   const fetchDataFromAPI = async () => {
     try {
@@ -26,8 +29,8 @@ const useOpenAI = () => {
 
       const response = await decryptionofData(encrypt.data);
       setUserId(response.user._id)
-      
-     
+
+
     } catch (error) {
       console.error("Error fetching profile data:", error);
     }
@@ -44,11 +47,13 @@ const useOpenAI = () => {
 
     try {
       const api_Obj = {
-        sprompt:  `You are a physician that provides answers ready to be put in an electronic medical records system using the best practices in the medical field.
+        sprompt: `You are a physician that provides answers ready to be put in an electronic medical records system using the best practices in the medical field.
         Be concise, no editorial commands are needed, limit your answer to what is asked of you. Do not refer to external inputs from other physicians.
         Any answer should be provided as it would be entered in an EMR system by a physician.You are strictly prohibited from providing any kind of value from your end.Dont give any kind of value from your end. Patient Name come should like -Patient Name : [Patient Name], Date of Birth like -Date of Birth : [DOB] and MRN like -MRN : [MRN].
         You are given an existing text template ${currentText}. If ${currentText} contains any values, you must retain them and merge them into the new results without modifying or overwriting them.
         If a field in ${currentText} has a value, use that value. Do not generate dummy or placeholder data for that field. If a field is missing or empty, generate a new value for it.
+       ⚠️ Important: Translate all content — including field labels, values, and placeholder text — into the language specified in this variable: ${selectedOutputLanguage}. The output must be entirely in this language.
+       Respond **only** in ${selectedOutputLanguage}. Do not use English if another language is selected.
         `,
         uprompt: prompt,
         temperature: 0,

@@ -101,7 +101,7 @@ const Sidebar = () => {
   return (
     <div
       style={{
-        width: isSidebarOpen ? 300 : 50,
+        width: isSidebarOpen ? 250 : 50,
         height: "100%",
         display: "flex",
         flex: "1",
@@ -175,6 +175,7 @@ const Sidebar = () => {
               overflowY: "auto",
               scrollbarWidth: "thin",
               WebkitOverflowScrolling: "touch",
+              boxShadow: '0 1px 0px rgba(0, 0, 0, 0.2)'
             }}
           >
             {" "}
@@ -231,7 +232,6 @@ const Sidebar = () => {
           style={{
             width: "100%",
             bottom: 0,
-            marginTop: 30,
             justifyContent: "flex-end",
           }}
         >

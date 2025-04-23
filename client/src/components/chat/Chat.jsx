@@ -873,7 +873,7 @@ const Chat = () => {
         <Box
           style={{
             width: "100%",
-            height: "100%",
+            height: "calc(100vh - 210px)",
             display: "flex",
             justifyContent: "center",
             padding: 10,
@@ -944,8 +944,8 @@ const Chat = () => {
                 {!isLoading && !error && response && (newButtons || editButtons) && (
                   <div
                     style={{
-                      overflowY: "auto",
-                      height: "calc(100vh - 300px)",
+                      overflowY: "hidden",
+                      height: "100%",
                       paddingTop: 10,
                       paddingLeft: 10,
                       paddingRight: 10,
@@ -986,7 +986,7 @@ const Chat = () => {
                         outline: "none",          // No outline while editing.
                         width: "100%",            // Full width for consistency.
                         fontFamily: "inherit",    // Inherits the font from parent (you can customize this).
-                        height: "calc(100vh - 320px)",
+                        height: "inherit",
                         border: "none",
                         background: "none",
                         resize: "none",
@@ -1057,9 +1057,9 @@ const Chat = () => {
               flexDirection: "column",
               justifyContent: "center",
               alignItems: "center",
-              margin: "auto", // Add this line to center the div
-              marginRight: "10px",
-              marginLeft: "10px",
+              marginTop: "30px",
+              marginRight: "15px",
+              marginLeft: "15px",
             }}
           >
             <div
@@ -1072,27 +1072,27 @@ const Chat = () => {
             >
 
               {buttonData?.map((buttons, i) => {
-                  return (
-                    <Button
-                      variant="outlined"
-                      style={{
-                        marginBottom: "10px",
-                        borderRadius: "50%",
-                        width: "50px",
-                        height: "50px",
-                        minWidth: "50px",
-                        backgroundColor: "#CDE0EA",
-                        color: "#023246",
-                        fontSize: "11px",
-                      }}
-                      key={i}
-                      onClick={() =>
-                        handlebuttonSubmit(buttons.name)}
-                    >
-                      {buttons.name}
-                    </Button>
-                  )
-                })}
+                return (
+                  <Button
+                    variant="outlined"
+                    style={{
+                      marginBottom: "10px",
+                      borderRadius: "50%",
+                      width: "50px",
+                      height: "50px",
+                      minWidth: "50px",
+                      backgroundColor: "#CDE0EA",
+                      color: "#023246",
+                      fontSize: "11px",
+                    }}
+                    key={i}
+                    onClick={() =>
+                      handlebuttonSubmit(buttons.name)}
+                  >
+                    {buttons.name}
+                  </Button>
+                )
+              })}
             </div>
             <MicrophoneInput
               data={data}
@@ -1280,56 +1280,56 @@ const Chat = () => {
 
         {
           adminStatus &&
+          <div
+            style={{
+              width: "100%",
+              display: "flex",
+              justifyContent: "center",
+              alignItems: "flex-start",
+            }}
+          >
             <div
               style={{
-                width: "100%",
+                width: isScreen ? "90%" : "100%",
+                borderRadius: "15px",
+                height: "50px",
+                border: "1px solid #808080",
+                marginLeft: "10px",
+                marginRight: isScreen ? "11%" : "5.5%",
+                marginBottom: 15,
                 display: "flex",
+                flexDirection: "column",
                 justifyContent: "center",
-                alignItems: "flex-start",
+                alignItems: "center",
+                boxShadow: "10px 10px 15px rgba(0, 0, 0, 0.2)",
+                backgroundColor: "#FAFEFF",
               }}
             >
               <div
                 style={{
-                  width: isScreen ? "90%" : "100%",
-                  borderRadius: "15px",
-                  height: "50px",
-                  border: "1px solid #808080",
-                  marginLeft: "10px",
-                  marginRight: isScreen ? "11%" : "5.5%",
-                  marginBottom: 15,
+                  width: "100%",
                   display: "flex",
-                  flexDirection: "column",
-                  justifyContent: "center",
+                  height: "100%",
                   alignItems: "center",
-                  boxShadow: "10px 10px 15px rgba(0, 0, 0, 0.2)",
-                  backgroundColor: "#FAFEFF",
                 }}
               >
-                <div
+                <TextField
+                  variant="standard"
+                  placeholder="Chat with AI ...."
+                  onChange={(e) => {
+                    setBrainInput(e.target.value);
+                  }}
+                  value={brainInput}
                   style={{
                     width: "100%",
-                    display: "flex",
-                    height: "100%",
-                    alignItems: "center",
+                    padding: "1%",
                   }}
-                >
-                  <TextField
-                    variant="standard"
-                    placeholder="Chat with AI ...."
-                    onChange={(e) => {
-                      setBrainInput(e.target.value);
-                    }}
-                    value={brainInput}
-                    style={{
-                      width: "100%",
-                      padding: "1%",
-                    }}
-                    InputProps={{ disableUnderline: true }}
-                    InputLabelProps={{
-                      style: { color: "#023246" },
-                    }}
-                  />
-                  {/* <Brain_Mic
+                  InputProps={{ disableUnderline: true }}
+                  InputLabelProps={{
+                    style: { color: "#023246" },
+                  }}
+                />
+                {/* <Brain_Mic
                 value={brainInput}
                 gptFunction={gptFunction}
                 getBrainInput={getBrainInput}
@@ -1340,18 +1340,18 @@ const Chat = () => {
                 onBrainEngage={handleBrainEngage}
                 onBrainDisengage={handleBrainDisengage}
               /> */}
-                  <BrainButton
-                    isLoading={isLoading}
-                    isBrainEngaged={isBrainEngaged}
-                    isMicrophoneOn={isMicrophoneOn}
-                    handleMic={handleBrainMic}
-                    handleClick={handleBrainButtonClick}
-                    startRecording={startMicrophone}
-                    stopMicrophone={stopMicrophone}
-                  />
-                </div>
+                <BrainButton
+                  isLoading={isLoading}
+                  isBrainEngaged={isBrainEngaged}
+                  isMicrophoneOn={isMicrophoneOn}
+                  handleMic={handleBrainMic}
+                  handleClick={handleBrainButtonClick}
+                  startRecording={startMicrophone}
+                  stopMicrophone={stopMicrophone}
+                />
               </div>
             </div>
+          </div>
         }
         <AddpatientModal open={addpatientModal} onClose={() => setaddpatientmodal(false)} setPatientname={setPatientname} fetchRecord={fetchRecord} response={response} handleSubmit={handleSubmit} handlepatientsubmit={handlepatientsubmit} patientname={patientname} />
       </div>

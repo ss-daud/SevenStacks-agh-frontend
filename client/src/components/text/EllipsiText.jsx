@@ -8,7 +8,7 @@ const EllipsisText = ({ text, dob }) => {
     <Tooltip title={text} arrow placement="top" className="ellipisis-container">
     <div>
       <div className="ellipsis-text">
-        {text.length > 8 ? text.slice(0, 8) + "..." : text}
+        {text.length > 8 ? text.slice(0, 5) + "..." : text}
       </div>
       <div className="ellipsis-dob">
         {dob}

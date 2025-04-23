@@ -1,8 +1,9 @@
 import React, { useState, useEffect, useRef } from "react";
 
-import { Box, Button, useMediaQuery, FormControl, Select, MenuItem } from "@mui/material";
+import { Box, Button, useMediaQuery, FormControl, Select, MenuItem, InputLabel } from "@mui/material";
 import img1 from "../assets/imgs/mic.png";
 import Mike from "./Mike/Mike";
+import { useChatContext } from "../context/ChatContext";
 
 const MicrophoneInput = ({
   data,
@@ -30,6 +31,7 @@ const MicrophoneInput = ({
   const [isMediumScreen, setIsMediumScreen] = useState(
     window.innerWidth > 50 && window.innerWidth <= 900
   );
+  const { selectedOutputLanguage, setSelectedOutputLanguage } = useChatContext();
   const cursorPositionRef = useRef(-1);
 
   const handleResize = () => {
@@ -134,7 +136,8 @@ const MicrophoneInput = ({
   return (
     <>
       <div>
-        <FormControl style={{ marginBottom: 16, marginLeft: 10, background: selectedLanguage ? '#E0F7FA' : 'transparent', border: '1px solid blue', borderRadius: '5px' }}>
+        <FormControl style={{ marginBottom: 16, marginLeft: 10, background: selectedLanguage ? '#E0F7FA' : 'transparent', borderRadius: '5px' }}>
+          <InputLabel id="demo-multiple-name-label">Input</InputLabel>
           <Select
             labelId="language-select-label"
             id="language-select"
@@ -153,6 +156,25 @@ const MicrophoneInput = ({
           </Select>
         </FormControl>
       </div>
+      <FormControl style={{ marginBottom: 16, marginLeft: 10, background: selectedLanguage ? '#E0F7FA' : 'transparent', borderRadius: '5px' }}>
+        <InputLabel id="demo-multiple-name-label">Output</InputLabel>
+        <Select
+          labelId="language-select-label"
+          id="language-select"
+          value={selectedOutputLanguage}
+          label="Language"
+          onChange={(e) => {
+            if (!isMicrophoneActive) {
+              setSelectedOutputLanguage(e.target.value);
+            }
+          }}
+        >
+          <MenuItem key="Arabic" value="Arabic">AR</MenuItem>
+          <MenuItem value="English">EN</MenuItem>
+          <MenuItem value="Spanish">ES</MenuItem>
+          <MenuItem value="Turkish">TR</MenuItem>
+        </Select>
+      </FormControl>
       <div>
         <Box style={{ marginBottom: 10, }}>
           {isMicrophoneActive ? (

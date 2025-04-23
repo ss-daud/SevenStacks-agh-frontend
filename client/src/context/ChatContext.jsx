@@ -14,6 +14,7 @@ export function ChatContextProvider({ children }) {
   const [reports, setReports] = useState([]);
   const [previousInput, setPreviousInput] = useState("");
   const [history, setHistory] = useState([response]);
+  const [selectedOutputLanguage, setSelectedOutputLanguage] = useState('English');
 
   return (
     <ChatContext.Provider
@@ -29,7 +30,9 @@ export function ChatContextProvider({ children }) {
         previousInput,
         setPreviousInput,
         history,
-        setHistory
+        setHistory,
+        selectedOutputLanguage,
+        setSelectedOutputLanguage
       }}
     >
       {children}

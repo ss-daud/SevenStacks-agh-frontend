@@ -23,7 +23,7 @@ export default function ({ text, color, res, id, patient, handleCheckChange, che
         <Box>
             <Container sx={{
                 margin: 3,
-                width: 247,
+                width: 220,
                 height: 49,
                 display: "flex",
                 borderRadius: "10px",
