@@ -43,8 +43,6 @@ const useOpenAI = () => {
     setIsLoading(true);
     setError(null);
 
-
-
     try {
       const api_Obj = {
         sprompt: `You are a physician that provides answers ready to be put in an electronic medical records system using the best practices in the medical field.
@@ -53,21 +51,22 @@ const useOpenAI = () => {
         You are given an existing text template ${currentText}. If ${currentText} contains any values, you must retain them and merge them into the new results without modifying or overwriting them.
         If a field in ${currentText} has a value, use that value. Do not generate dummy or placeholder data for that field. If a field is missing or empty, generate a new value for it.
        ⚠️ Important: Translate all content — including field labels, values, and placeholder text — into the language specified in this variable: ${selectedOutputLanguage}. The output must be entirely in this language.
-       Respond **only** in ${selectedOutputLanguage}. Do not use English if another language is selected.
+       Respond **only** in ${selectedOutputLanguage}. Do not use English if another language is selected.Return All your headings in bold.
         `,
         uprompt: prompt,
         temperature: 0,
         userId
       };
-      const encrypted_payload = encryptionofdata(api_Obj);
+      // const encrypted_payload = encryptionofdata(api_Obj);
 
       const messageContent = await axios.post(
         `${AUTH_URL}api/user/search`,
-        { encrypted_payload: encrypted_payload }
+        api_Obj
+        // { encrypted_payload: encrypted_payload }
       );
 
-      const decrypted_data = await decryptionofData(messageContent.data.encrypted_response);
-      setData(decrypted_data.encrypted_response);
+      // const decrypted_data = await decryptionofData(messageContent.data.encrypted_response);
+      setData(messageContent.data.res_data.encrypted_response);
     } catch (err) {
       setError(err);
     } finally {
@@ -85,16 +84,19 @@ const useOpenAI = () => {
         temperature: 0.5,
         userId
       };
-      const encrypted_payload = encryptionofdata(api_Obj);
+      // const encrypted_payload = encryptionofdata(api_Obj);
       const messageContent = await axios.post(
         `${AUTH_URL}api/user/search`,
-        { encrypted_payload: encrypted_payload }
+        api_Obj
+        // { encrypted_payload: encrypted_payload }
       )
 
-      const decrypted_res = await decryptionofData(messageContent.data.encrypted_response);
-      setData(decrypted_res.encrypted_response);
-      const datarecord = await fetchRecord(decrypted_res.encrypted_response);
-      return { record: datarecord, content: decrypted_res.encrypted_response };
+      console.log("messageContent", messageContent.data);
+
+      // const decrypted_res = await decryptionofData(messageContent.data.encrypted_response);
+      setData(messageContent.data.res_data.encrypted_response);
+      const datarecord = await fetchRecord(messageContent.data.res_data.encrypted_response);
+      return { record: datarecord, content: messageContent.data.res_data.encrypted_response };
     } catch (error) {
       setError(error)
     } finally {
@@ -126,20 +128,22 @@ const useOpenAI = () => {
       **Above output is just dummy to make you understand the thing.**
       **Never return me data with starting and ending with backticks and writted json in the string.**
       I want you to ignore this method of output returning **json{"Patient_Name": null, "DOB": null, "MRN": null}**
-      Just give me response in JSON format without adding any backticks and written JSON in it`,
+      Just give me response in JSON format without adding any backticks and written JSON in it.
+      `,
         uprompt: prompt,
         temperature: 0,
         userId
       };
 
-      const encrypted_payload = encryptionofdata(api_Obj);
+      // const encrypted_payload = encryptionofdata(api_Obj);
 
-      const messageContent = await axios.post(
+      var messageContent = await axios.post(
         `${AUTH_URL}api/user/search`,
-        { encrypted_payload: encrypted_payload }
+        api_Obj
+        // { encrypted_payload: encrypted_payload }
       )
-      const decrypted_res = await decryptionofData(messageContent.data.encrypted_response);
-      const recordedContent = decrypted_res.encrypted_response;
+      // const decrypted_res = await decryptionofData(messageContent.data.encrypted_response);
+      const recordedContent = messageContent.data.res_data.encrypted_response;
 
       if (!recordedContent.startsWith("{")) {
         recordedContent = recordedContent.replace(/```json|```/g, "").trim();
