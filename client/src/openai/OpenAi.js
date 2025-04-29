@@ -51,7 +51,7 @@ const useOpenAI = () => {
         You are given an existing text template ${currentText}. If ${currentText} contains any values, you must retain them and merge them into the new results without modifying or overwriting them.
         If a field in ${currentText} has a value, use that value. Do not generate dummy or placeholder data for that field. If a field is missing or empty, generate a new value for it.
        ⚠️ Important: Translate all content — including field labels, values, and placeholder text — into the language specified in this variable: ${selectedOutputLanguage}. The output must be entirely in this language.
-       Respond **only** in ${selectedOutputLanguage}. Do not use English if another language is selected.Return All your headings in bold.
+       Respond **only** in ${selectedOutputLanguage}. Do not use English if another language is selected.
         `,
         uprompt: prompt,
         temperature: 0,
